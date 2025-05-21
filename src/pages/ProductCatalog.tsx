@@ -1,12 +1,14 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import ProductCard from '@/components/ProductCard';
+import { Product, ProductCategory } from '@/types';
 import { ChevronDown, Filter, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 
 // Sample product data
-const allProducts = [
+const allProducts: Product[] = [
   {
     id: '1',
     name: 'Oversized Cotton Shirt',
@@ -137,13 +139,14 @@ const allProducts = [
 ];
 
 const ProductCatalog = () => {
-  const { category } = useParams();
-  const [products, setProducts] = useState([]);
+  // We're now using the updated ProductCategory type that includes 'all', 'new', and 'sale'
+  const { category } = useParams<{ category?: string }>();
+  const [products, setProducts] = useState<Product[]>([]);
   const [filters, setFilters] = useState({
     priceRange: [0, 300],
-    sizes: [],
-    colors: [],
-    brands: [],
+    sizes: [] as string[],
+    colors: [] as string[],
+    brands: [] as string[],
     inStock: false,
     onSale: false
   });
@@ -179,11 +182,11 @@ const ProductCatalog = () => {
     }
     
     if (filters.sizes.length > 0) {
-      filtered = filtered.filter(p => p.sizes && filters.sizes.some(s => p.sizes.includes(s)));
+      filtered = filtered.filter(p => p.sizes && filters.sizes.some(s => p.sizes!.includes(s)));
     }
     
     if (filters.colors.length > 0) {
-      filtered = filtered.filter(p => p.colors && filters.colors.some(c => p.colors.includes(c)));
+      filtered = filtered.filter(p => p.colors && filters.colors.some(c => p.colors!.includes(c)));
     }
     
     if (filters.brands.length > 0) {
@@ -216,7 +219,7 @@ const ProductCatalog = () => {
     setProducts(filtered);
   }, [category, filters, sortBy]);
 
-  const toggleSize = (size) => {
+  const toggleSize = (size: string) => {
     setFilters(prev => ({
       ...prev,
       sizes: prev.sizes.includes(size) 
@@ -225,7 +228,7 @@ const ProductCatalog = () => {
     }));
   };
 
-  const toggleColor = (color) => {
+  const toggleColor = (color: string) => {
     setFilters(prev => ({
       ...prev,
       colors: prev.colors.includes(color) 
@@ -234,7 +237,7 @@ const ProductCatalog = () => {
     }));
   };
 
-  const toggleBrand = (brand) => {
+  const toggleBrand = (brand: string) => {
     setFilters(prev => ({
       ...prev,
       brands: prev.brands.includes(brand) 

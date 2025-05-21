@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
@@ -9,14 +10,14 @@ import {
   Calendar, 
   CreditCardIcon, 
   UserCheck, 
-  ShoppingBag,
-  Truck
+  ShoppingBag 
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/components/ui/sonner';
+import { CartItem } from '@/types';
 
 // Sample cart data (would typically come from context or state management)
-const sampleCartItems = [
+const sampleCartItems: CartItem[] = [
   {
     id: '1',
     name: 'Oversized Cotton Shirt',
@@ -45,14 +46,39 @@ const sampleCartItems = [
 ];
 
 // Step type definition
-const Checkout = () => {
+type CheckoutStep = 'shipping' | 'payment' | 'confirmation';
+
+// Form field state types
+interface ShippingFormState {
+  firstName: string;
+  lastName: string;
+  address: string;
+  apartment?: string;
+  city: string;
+  state: string;
+  zipCode: string;
+  country: string;
+  phone: string;
+  email: string;
+  saveInfo: boolean;
+}
+
+interface PaymentFormState {
+  cardNumber: string;
+  cardName: string;
+  expDate: string;
+  cvv: string;
+  saveCard: boolean;
+}
+
+const Checkout: React.FC = () => {
   const navigate = useNavigate();
-  const [currentStep, setCurrentStep] = useState('shipping');
+  const [currentStep, setCurrentStep] = useState<CheckoutStep>('shipping');
   const [isProcessing, setIsProcessing] = useState(false);
-  const [orderId, setOrderId] = useState(null);
+  const [orderId, setOrderId] = useState<string | null>(null);
   
   // Form states
-  const [shippingInfo, setShippingInfo] = useState({
+  const [shippingInfo, setShippingInfo] = useState<ShippingFormState>({
     firstName: '',
     lastName: '',
     address: '',
@@ -66,7 +92,7 @@ const Checkout = () => {
     saveInfo: false
   });
   
-  const [paymentInfo, setPaymentInfo] = useState({
+  const [paymentInfo, setPaymentInfo] = useState<PaymentFormState>({
     cardNumber: '',
     cardName: '',
     expDate: '',
@@ -80,7 +106,7 @@ const Checkout = () => {
   const tax = subtotal * 0.08; // 8% tax rate for demo
   const total = subtotal + shipping + tax;
 
-  const handleShippingSubmit = (e) => {
+  const handleShippingSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
     // Basic validation
@@ -97,7 +123,7 @@ const Checkout = () => {
     window.scrollTo(0, 0);
   };
 
-  const handlePaymentSubmit = (e) => {
+  const handlePaymentSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
     // Basic validation for payment info
@@ -120,7 +146,7 @@ const Checkout = () => {
     }, 2000);
   };
 
-  const formatCardNumber = (value) => {
+  const formatCardNumber = (value: string) => {
     if (!value) return value;
     // Remove all non-digit characters
     const v = value.replace(/\D/g, '');
@@ -137,7 +163,7 @@ const Checkout = () => {
     return value;
   };
 
-  const formatExpDate = (value) => {
+  const formatExpDate = (value: string) => {
     if (!value) return value;
     const v = value.replace(/\D/g, '');
     if (v.length <= 4) {
@@ -149,12 +175,12 @@ const Checkout = () => {
     return value;
   };
 
-  const handleCardNumberChange = (e) => {
+  const handleCardNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const formattedValue = formatCardNumber(e.target.value);
     setPaymentInfo({ ...paymentInfo, cardNumber: formattedValue });
   };
 
-  const handleExpDateChange = (e) => {
+  const handleExpDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const formattedValue = formatExpDate(e.target.value);
     setPaymentInfo({ ...paymentInfo, expDate: formattedValue });
   };
