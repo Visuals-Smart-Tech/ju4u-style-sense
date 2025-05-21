@@ -1,6 +1,7 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Heart, Share, ChevronRight, Star, Minus, Plus, ShoppingBag, X } from 'lucide-react'; // Added X icon
+import { Heart, Share, ChevronRight, Star, Minus, Plus, ShoppingBag, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import ProductCard from '@/components/ProductCard';
 import FitAssistant from '@/components/FitAssistant';

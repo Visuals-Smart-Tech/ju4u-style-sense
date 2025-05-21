@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { X, Plus, Minus, ShoppingBag, ArrowRight } from 'lucide-react';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Trash2, ShoppingBag, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/components/ui/sonner';
 
-// Sample cart data
+// Sample cart items
 const initialCartItems = [
   {
     id: '1',
@@ -13,11 +13,8 @@ const initialCartItems = [
     images: ['https://images.unsplash.com/photo-1604176424472-9e9468137614?q=80&w=1974'],
     category: 'women',
     description: 'A relaxed fit oversized cotton shirt perfect for everyday wear.',
-    sizes: ['XS', 'S', 'M', 'L', 'XL'],
-    colors: ['White', 'Black', 'Blue'],
     brand: 'JU4U Essentials',
     inStock: true,
-    featured: true,
     quantity: 1,
     selectedSize: 'M',
     selectedColor: 'White'
@@ -29,247 +26,228 @@ const initialCartItems = [
     images: ['https://images.unsplash.com/photo-1594223274512-ad4803739b7c?q=80&w=2057'],
     category: 'accessories',
     description: 'A versatile leather crossbody bag with adjustable strap.',
-    colors: ['Black', 'Brown', 'Tan'],
     brand: 'JU4U Accessories',
     inStock: true,
-    featured: true,
-    bestseller: true,
     quantity: 1,
     selectedColor: 'Black'
   }
 ];
 
 const Cart = () => {
+  const navigate = useNavigate();
   const [cartItems, setCartItems] = useState(initialCartItems);
   const [promoCode, setPromoCode] = useState('');
   const [promoApplied, setPromoApplied] = useState(false);
-  const [discount, setDiscount] = useState(0);
+  const [isApplyingPromo, setIsApplyingPromo] = useState(false);
   
-  // Calculate totals
+  // Calculate cart totals
   const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const discount = promoApplied ? subtotal * 0.15 : 0; // 15% discount when promo applied
   const shipping = subtotal > 100 ? 0 : 9.99;
-  const total = subtotal + shipping - discount;
-
-  const updateQuantity = (id, newQuantity) => {
-    if (newQuantity < 1) return;
-    
-    setCartItems(prevItems => 
-      prevItems.map(item => 
-        item.id === id ? { ...item, quantity: newQuantity } : item
-      )
-    );
-  };
+  const tax = (subtotal - discount) * 0.08; // 8% tax
+  const total = subtotal - discount + shipping + tax;
 
   const removeItem = (id) => {
-    setCartItems(prevItems => prevItems.filter(item => item.id !== id));
-    toast("Item removed from cart");
+    setCartItems(cartItems.filter(item => item.id !== id));
+    toast({
+      title: "Item removed from cart",
+    });
   };
 
-  const handlePromoCode = () => {
-    // Simple demo promo code
-    if (promoCode.toLowerCase() === 'ju4u20') {
-      setDiscount(subtotal * 0.2);
+  const updateQuantity = (id, change) => {
+    setCartItems(cartItems.map(item => {
+      if (item.id === id) {
+        const newQuantity = Math.max(1, item.quantity + change);
+        return { ...item, quantity: newQuantity };
+      }
+      return item;
+    }));
+  };
+
+  const applyPromoCode = async () => {
+    setIsApplyingPromo(true);
+    
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    if (promoCode === 'JU4U15') {
       setPromoApplied(true);
-      toast.success("Promo code applied successfully!");
+      toast({
+        title: "Promo code applied!",
+        description: "You got 15% off",
+      });
     } else {
-      toast.error("Invalid promo code");
+      toast({
+        title: "Invalid promo code",
+        variant: "destructive",
+      });
+      setPromoApplied(false);
     }
+    
+    setIsApplyingPromo(false);
   };
-
-  const clearPromoCode = () => {
-    setPromoApplied(false);
-    setDiscount(0);
-    setPromoCode('');
-  };
-
-  // Save cart to localStorage (for demo purposes)
-  useEffect(() => {
-    // In a real app, we'd save to user's profile or session
-    console.log("Cart updated:", cartItems);
-  }, [cartItems]);
 
   return (
     <div className="container max-w-7xl mx-auto px-4 py-8">
-      <h1 className="text-3xl md:text-4xl font-bold mb-8">Your Shopping Cart</h1>
+      <h1 className="text-3xl md:text-4xl font-bold mb-8">Shopping Cart</h1>
       
       {cartItems.length === 0 ? (
-        <div className="text-center py-16 border rounded-lg">
-          <div className="mb-6 flex justify-center">
-            <ShoppingBag className="h-16 w-16 text-gray-400" />
-          </div>
+        <div className="text-center py-16">
+          <ShoppingBag className="mx-auto h-10 w-10 text-gray-400 mb-4" />
           <h2 className="text-xl font-semibold mb-2">Your cart is empty</h2>
-          <p className="text-gray-600 mb-8">Looks like you haven't added any products to your cart yet.</p>
+          <p className="text-gray-600 mb-6">Looks like you haven't added anything to your cart yet.</p>
           <Link to="/catalog">
             <Button>Continue Shopping</Button>
           </Link>
         </div>
       ) : (
-        <div className="flex flex-col lg:flex-row gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Cart Items */}
-          <div className="lg:w-2/3">
-            <div className="hidden md:flex font-medium text-gray-500 mb-4 pb-2 border-b">
-              <div className="w-1/2">Product</div>
-              <div className="w-1/4 text-center">Quantity</div>
-              <div className="w-1/4 text-right">Total</div>
-            </div>
-            
-            {cartItems.map(item => (
-              <div key={item.id} className="flex flex-col md:flex-row items-center py-6 border-b">
-                {/* Product Info */}
-                <div className="w-full md:w-1/2 flex mb-4 md:mb-0">
-                  <div className="w-20 h-20 bg-gray-100 rounded overflow-hidden flex-shrink-0">
-                    <img 
-                      src={item.images[0]} 
-                      alt={item.name} 
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div className="ml-4 flex-1">
-                    <Link to={`/product/${item.id}`} className="font-medium hover:text-ju4u-coral transition-colors">
-                      {item.name}
-                    </Link>
-                    <p className="text-gray-500 text-sm mt-1">{item.brand}</p>
-                    <div className="text-sm text-gray-600 mt-1 space-y-1">
-                      {item.selectedSize && <p>Size: {item.selectedSize}</p>}
-                      {item.selectedColor && <p>Color: {item.selectedColor}</p>}
-                      <p>${item.price.toFixed(2)}</p>
+          <div className="lg:col-span-2">
+            <div className="bg-white p-6 rounded-lg shadow-sm border">
+              <h2 className="text-lg font-semibold mb-6 pb-4 border-b">Items in Your Cart</h2>
+              
+              <div className="space-y-6">
+                {cartItems.map(item => (
+                  <div key={item.id} className="flex items-center border-b pb-4">
+                    <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
+                      <img 
+                        src={item.images[0]} 
+                        alt={item.name} 
+                        className="h-full w-full object-cover object-center"
+                      />
                     </div>
-                    <button 
-                      onClick={() => removeItem(item.id)} 
-                      className="text-gray-500 hover:text-ju4u-coral text-sm flex items-center mt-2 md:hidden"
-                    >
-                      <X className="h-3 w-3 mr-1" />
-                      Remove
-                    </button>
-                  </div>
-                </div>
-                
-                {/* Quantity */}
-                <div className="w-full md:w-1/4 flex justify-center my-4 md:my-0">
-                  <div className="flex items-center">
-                    <button 
-                      onClick={() => updateQuantity(item.id, item.quantity - 1)} 
-                      className="w-8 h-8 border border-gray-300 rounded-l-md flex items-center justify-center hover:bg-gray-100"
-                      disabled={item.quantity <= 1}
-                    >
-                      <Minus className="h-3 w-3" />
-                    </button>
-                    <div className="w-10 h-8 border-t border-b border-gray-300 flex items-center justify-center">
-                      {item.quantity}
+                    
+                    <div className="ml-4 flex flex-1 flex-col">
+                      <div>
+                        <div className="flex justify-between text-base font-medium">
+                          <h3>
+                            <Link to={`/product/${item.id}`}>{item.name}</Link>
+                          </h3>
+                          <p className="ml-4">${item.price.toFixed(2)}</p>
+                        </div>
+                        <p className="mt-1 text-sm text-gray-500">
+                          {item.selectedSize && `Size: ${item.selectedSize}`}
+                          {item.selectedSize && item.selectedColor && ', '}
+                          {item.selectedColor && `Color: ${item.selectedColor}`}
+                        </p>
+                      </div>
+                      
+                      <div className="flex flex-1 items-end justify-between text-sm">
+                        <div className="flex items-center">
+                          <button
+                            type="button"
+                            className="font-medium text-ju4u-coral hover:text-ju4u-coral/80"
+                            onClick={() => updateQuantity(item.id, -1)}
+                          >
+                            <ChevronLeft className="h-4 w-4" />
+                          </button>
+                          <span className="mx-2">{item.quantity}</span>
+                          <button
+                            type="button"
+                            className="font-medium text-ju4u-coral hover:text-ju4u-coral/80"
+                            onClick={() => updateQuantity(item.id, 1)}
+                          >
+                            <ChevronRight className="h-4 w-4" />
+                          </button>
+                        </div>
+                        
+                        <div className="flex">
+                          <button
+                            type="button"
+                            className="font-medium text-ju4u-coral hover:text-ju4u-coral/80"
+                            onClick={() => removeItem(item.id)}
+                          >
+                            <Trash2 className="h-4 w-4 mr-1" />
+                            Remove
+                          </button>
+                        </div>
+                      </div>
                     </div>
-                    <button 
-                      onClick={() => updateQuantity(item.id, item.quantity + 1)} 
-                      className="w-8 h-8 border border-gray-300 rounded-r-md flex items-center justify-center hover:bg-gray-100"
-                    >
-                      <Plus className="h-3 w-3" />
-                    </button>
                   </div>
-                </div>
-                
-                {/* Total */}
-                <div className="w-full md:w-1/4 flex items-center justify-between md:justify-end">
-                  <span className="text-gray-800 font-medium md:hidden">Total:</span>
-                  <span className="font-medium">${(item.price * item.quantity).toFixed(2)}</span>
-                  <button 
-                    onClick={() => removeItem(item.id)} 
-                    className="text-gray-500 hover:text-ju4u-coral ml-4 hidden md:block"
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
-                </div>
+                ))}
               </div>
-            ))}
-            
-            {/* Actions */}
-            <div className="mt-8 flex flex-col sm:flex-row justify-between items-center">
-              <Link to="/catalog" className="mb-4 sm:mb-0 text-ju4u-coral hover:underline">
-                Continue Shopping
-              </Link>
-              <Button 
-                variant="outline"
-                onClick={() => setCartItems([])}
-                className="text-gray-600"
-              >
-                Clear Cart
-              </Button>
+              
+              <div className="mt-6 flex justify-between items-center">
+                <Link
+                  to="/catalog"
+                  className="text-ju4u-coral hover:text-ju4u-coral/80 flex items-center"
+                >
+                  <ChevronLeft className="h-4 w-4 mr-2" />
+                  Continue Shopping
+                </Link>
+              </div>
             </div>
           </div>
           
           {/* Order Summary */}
-          <div className="lg:w-1/3">
-            <div className="bg-gray-50 p-6 rounded-lg">
-              <h2 className="text-xl font-bold mb-6">Order Summary</h2>
+          <div className="lg:col-span-1">
+            <div className="bg-white p-6 rounded-lg shadow-sm border sticky top-24">
+              <h2 className="text-lg font-semibold mb-6 pb-4 border-b">Order Summary</h2>
               
-              <div className="space-y-3 pb-6 mb-6 border-b border-gray-200">
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Subtotal</span>
-                  <span>${subtotal.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Shipping</span>
-                  <span>{shipping === 0 ? 'FREE' : `$${shipping.toFixed(2)}`}</span>
-                </div>
-                {discount > 0 && (
-                  <div className="flex justify-between text-ju4u-coral">
-                    <div className="flex items-center">
-                      <span>Discount</span>
-                      <button 
-                        onClick={clearPromoCode} 
-                        className="ml-2 text-gray-400 hover:text-ju4u-coral"
-                      >
-                        <X className="h-3 w-3" />
-                      </button>
-                    </div>
-                    <span>-${discount.toFixed(2)}</span>
-                  </div>
-                )}
-              </div>
-              
-              <div className="flex justify-between font-bold text-lg mb-6">
-                <span>Total</span>
-                <span>${total.toFixed(2)}</span>
-              </div>
-              
-              {/* Promo Code */}
-              {!promoApplied && (
-                <div className="mb-6">
-                  <div className="flex items-stretch">
+              <div className="mb-4">
+                <label htmlFor="promoCode" className="block text-sm font-medium text-gray-700">
+                  Promo Code
+                </label>
+                <div className="mt-1 flex rounded-md shadow-sm">
+                  <div className="relative flex items-stretch flex-grow focus-within:z-10">
                     <input
                       type="text"
+                      name="promoCode"
+                      id="promoCode"
+                      className="block w-full rounded-none rounded-l-md border border-gray-300 px-3 py-2 text-gray-900 focus:outline-none focus:ring-ju4u-coral focus:border-ju4u-coral sm:text-sm"
+                      placeholder="Enter promo code"
                       value={promoCode}
                       onChange={(e) => setPromoCode(e.target.value)}
-                      placeholder="Promo code"
-                      className="flex-1 rounded-l-md border-r-0 focus-visible:ring-0"
                     />
-                    <button
-                      onClick={handlePromoCode}
-                      className="bg-ju4u-black text-white px-4 rounded-r-md"
-                    >
-                      Apply
-                    </button>
                   </div>
-                  <p className="text-xs text-gray-500 mt-1">Try "JU4U20" for 20% off</p>
+                  <button
+                    type="button"
+                    className="relative -ml-px inline-flex items-center space-x-2 rounded-r-md border border-gray-300 bg-gray-50 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 focus:border-ju4u-coral focus:outline-none focus:ring-1 focus:ring-ju4u-coral"
+                    onClick={applyPromoCode}
+                    disabled={isApplyingPromo}
+                  >
+                    {isApplyingPromo ? (
+                      <>Applying...</>
+                    ) : (
+                      <>Apply</>
+                    )}
+                  </button>
                 </div>
-              )}
+              </div>
               
-              {/* Checkout Button */}
-              <Link to="/checkout">
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <p className="text-gray-600">Subtotal</p>
+                  <p>${subtotal.toFixed(2)}</p>
+                </div>
+                {promoApplied && (
+                  <div className="flex justify-between text-sm text-green-600">
+                    <p>Discount (15%)</p>
+                    <p>- ${discount.toFixed(2)}</p>
+                  </div>
+                )}
+                <div className="flex justify-between text-sm">
+                  <p className="text-gray-600">Shipping</p>
+                  <p>{shipping > 0 ? `$${shipping.toFixed(2)}` : 'Free'}</p>
+                </div>
+                <div className="flex justify-between text-sm mb-4">
+                  <p className="text-gray-600">Tax</p>
+                  <p>${tax.toFixed(2)}</p>
+                </div>
+                <div className="flex justify-between text-base font-semibold">
+                  <p>Total</p>
+                  <p>${total.toFixed(2)}</p>
+                </div>
+              </div>
+              
+              <div className="mt-6">
                 <Button 
-                  className="w-full flex items-center justify-center bg-ju4u-coral hover:bg-opacity-90 py-6"
+                  className="w-full justify-center"
+                  onClick={() => navigate('/checkout')}
                 >
                   Proceed to Checkout
-                  <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
-              </Link>
-              
-              {/* Payment Methods */}
-              <div className="mt-6 flex justify-center space-x-2">
-                <div className="text-xs text-gray-500">We accept:</div>
-                <div className="flex space-x-2">
-                  <div className="text-xs">Visa</div>
-                  <div className="text-xs">MasterCard</div>
-                  <div className="text-xs">PayPal</div>
-                </div>
               </div>
             </div>
           </div>

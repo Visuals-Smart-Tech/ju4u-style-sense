@@ -74,12 +74,16 @@ const featuredProducts = [
   }
 ];
 
-const FeaturedProducts = () => {
+const FeaturedProducts = (props) => {
+  // Added props parameter to receive title and subtitle if provided
+  const title = props.title || "Featured Products";
+  const subtitle = props.subtitle || "Handpicked for your unique style";
+
   return (
     <section className="py-12 md:py-16">
       <div className="container max-w-7xl mx-auto px-4">
         <div className="flex justify-between items-center mb-8">
-          <h2 className="text-2xl md:text-3xl font-bold">Featured Products</h2>
+          <h2 className="text-2xl md:text-3xl font-bold">{title}</h2>
           <Link to="/catalog" className="text-ju4u-coral flex items-center hover:underline">
             View All
             <ChevronRight className="h-4 w-4 ml-1" />

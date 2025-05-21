@@ -1,606 +1,715 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { 
+  CreditCard, 
+  Lock, 
+  CheckCircle, 
+  ChevronRight, 
+  X, 
+  Calendar, 
+  CreditCardIcon, 
+  UserCheck, 
+  ShoppingBag,
+  Truck
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Separator } from '@/components/ui/separator';
-import { toast } from '@/hooks/use-toast';
-import { Truck, X } from 'lucide-react'; // Added missing Truck icon import
+import { toast } from '@/components/ui/sonner';
 
+// Sample cart data (would typically come from context or state management)
+const sampleCartItems = [
+  {
+    id: '1',
+    name: 'Oversized Cotton Shirt',
+    price: 89.99,
+    images: ['https://images.unsplash.com/photo-1604176424472-9e9468137614?q=80&w=1974'],
+    category: 'women',
+    description: 'A relaxed fit oversized cotton shirt perfect for everyday wear.',
+    brand: 'JU4U Essentials',
+    inStock: true,
+    quantity: 1,
+    selectedSize: 'M',
+    selectedColor: 'White'
+  },
+  {
+    id: '3',
+    name: 'Leather Crossbody Bag',
+    price: 149.99,
+    images: ['https://images.unsplash.com/photo-1594223274512-ad4803739b7c?q=80&w=2057'],
+    category: 'accessories',
+    description: 'A versatile leather crossbody bag with adjustable strap.',
+    brand: 'JU4U Accessories',
+    inStock: true,
+    quantity: 1,
+    selectedColor: 'Black'
+  }
+];
+
+// Step type definition
 const Checkout = () => {
-  const [step, setStep] = useState('shipping');
+  const navigate = useNavigate();
+  const [currentStep, setCurrentStep] = useState('shipping');
   const [isProcessing, setIsProcessing] = useState(false);
-  const [orderComplete, setOrderComplete] = useState(false);
-  const [orderId, setOrderId] = useState('');
+  const [orderId, setOrderId] = useState(null);
   
-  // Shipping form state
+  // Form states
   const [shippingInfo, setShippingInfo] = useState({
     firstName: '',
     lastName: '',
-    email: '',
-    phone: '',
     address: '',
     apartment: '',
     city: '',
     state: '',
     zipCode: '',
-    country: 'US',
-    saveInfo: true
+    country: 'United States',
+    phone: '',
+    email: '',
+    saveInfo: false
   });
   
-  // Payment form state
   const [paymentInfo, setPaymentInfo] = useState({
     cardNumber: '',
-    nameOnCard: '',
-    expiryDate: '',
+    cardName: '',
+    expDate: '',
     cvv: '',
     saveCard: false
   });
   
-  // Shipping method state
-  const [shippingMethod, setShippingMethod] = useState('standard');
-  
-  // Cart items (mock data)
-  const cartItems = [
-    {
-      id: '1',
-      name: 'Oversized Cotton Shirt',
-      price: 89.99,
-      images: ['https://images.unsplash.com/photo-1604176424472-9e9468137614?q=80&w=1974'],
-      selectedSize: 'M',
-      selectedColor: 'White',
-      quantity: 1,
-      brand: 'JU4U Essentials',
-    },
-    {
-      id: '3',
-      name: 'Leather Crossbody Bag',
-      price: 149.99,
-      images: ['https://images.unsplash.com/photo-1594223274512-ad4803739b7c?q=80&w=2057'],
-      selectedColor: 'Black',
-      quantity: 1,
-      brand: 'JU4U Accessories',
-    }
-  ];
-  
-  // Calculate order summary
-  const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  const shipping = shippingMethod === 'express' ? 14.99 : 4.99;
-  const tax = subtotal * 0.08; // 8% tax rate
+  // Calculate totals
+  const subtotal = sampleCartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const shipping = subtotal > 100 ? 0 : 9.99;
+  const tax = subtotal * 0.08; // 8% tax rate for demo
   const total = subtotal + shipping + tax;
-  
-  const handleShippingInfoChange = (e) => {
-    const { name, value } = e.target;
-    setShippingInfo(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-  
-  const handlePaymentInfoChange = (e) => {
-    const { name, value } = e.target;
-    setPaymentInfo(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-  
-  const validateShippingForm = () => {
-    const requiredFields = [
-      'firstName', 'lastName', 'email', 'phone', 'address', 'city', 'state', 'zipCode'
-    ];
+
+  const handleShippingSubmit = (e) => {
+    e.preventDefault();
     
-    for (const field of requiredFields) {
-      if (!shippingInfo[field]) {
-        toast({
-          title: "Missing Information",
-          description: `Please fill in your ${field.replace(/([A-Z])/g, ' $1').toLowerCase()}.`,
-          variant: "destructive",
-        });
-        return false;
+    // Basic validation
+    for (const [key, value] of Object.entries(shippingInfo)) {
+      if (key === 'apartment' || key === 'saveInfo') continue;
+      if (!value) {
+        toast.error(`Please enter your ${key.replace(/([A-Z])/g, ' $1').toLowerCase()}`);
+        return;
       }
     }
     
-    // Basic email validation
-    if (!/^\S+@\S+\.\S+$/.test(shippingInfo.email)) {
-      toast({
-        title: "Invalid Email",
-        description: "Please enter a valid email address.",
-        variant: "destructive",
-      });
-      return false;
-    }
-    
-    return true;
+    // Proceed to payment step
+    setCurrentStep('payment');
+    window.scrollTo(0, 0);
   };
-  
-  const validatePaymentForm = () => {
-    // Basic validation for demo purposes
-    if (!paymentInfo.cardNumber || !paymentInfo.nameOnCard || !paymentInfo.expiryDate || !paymentInfo.cvv) {
-      toast({
-        title: "Missing Payment Information",
-        description: "Please fill in all payment details.",
-        variant: "destructive",
-      });
-      return false;
-    }
-    
-    return true;
-  };
-  
-  const handleContinueToPayment = (e) => {
+
+  const handlePaymentSubmit = (e) => {
     e.preventDefault();
     
-    if (validateShippingForm()) {
-      setStep('payment');
-      window.scrollTo(0, 0);
+    // Basic validation for payment info
+    for (const [key, value] of Object.entries(paymentInfo)) {
+      if (key === 'saveCard') continue;
+      if (!value) {
+        toast.error(`Please enter your ${key.replace(/([A-Z])/g, ' $1').toLowerCase()}`);
+        return;
+      }
     }
-  };
-  
-  const handlePlaceOrder = async (e) => {
-    e.preventDefault();
     
-    if (!validatePaymentForm()) return;
-    
+    // Simulate payment processing
     setIsProcessing(true);
-    
-    // Simulate API call
     setTimeout(() => {
-      // Generate random order ID
-      const newOrderId = 'ORD-' + Math.floor(100000 + Math.random() * 900000).toString();
-      setOrderId(newOrderId);
-      
       setIsProcessing(false);
-      setOrderComplete(true);
-      
-      toast({
-        title: "Order Placed!",
-        description: `Your order #${newOrderId} has been successfully placed.`,
-      });
-      
+      setOrderId('JU4U-' + Math.floor(1000000 + Math.random() * 9000000));
+      setCurrentStep('confirmation');
       window.scrollTo(0, 0);
+      toast.success('Payment successful!');
     }, 2000);
   };
-  
-  if (orderComplete) {
+
+  const formatCardNumber = (value) => {
+    if (!value) return value;
+    // Remove all non-digit characters
+    const v = value.replace(/\D/g, '');
+    if (v.length <= 16) {
+      // Group in sets of 4 digits
+      return v.replace(/(\d{4})(\d{1,4})?(\d{1,4})?(\d{1,4})?/, (_, p1, p2, p3, p4) => {
+        let result = p1;
+        if (p2) result += ' ' + p2;
+        if (p3) result += ' ' + p3;
+        if (p4) result += ' ' + p4;
+        return result;
+      });
+    }
+    return value;
+  };
+
+  const formatExpDate = (value) => {
+    if (!value) return value;
+    const v = value.replace(/\D/g, '');
+    if (v.length <= 4) {
+      return v.replace(/(\d{2})(\d{1,2})?/, (_, p1, p2) => {
+        if (p2) return `${p1}/${p2}`;
+        return p1;
+      });
+    }
+    return value;
+  };
+
+  const handleCardNumberChange = (e) => {
+    const formattedValue = formatCardNumber(e.target.value);
+    setPaymentInfo({ ...paymentInfo, cardNumber: formattedValue });
+  };
+
+  const handleExpDateChange = (e) => {
+    const formattedValue = formatExpDate(e.target.value);
+    setPaymentInfo({ ...paymentInfo, expDate: formattedValue });
+  };
+
+  const renderStepIndicator = () => {
+    const steps = [
+      { id: 'shipping', label: 'Shipping' },
+      { id: 'payment', label: 'Payment' },
+      { id: 'confirmation', label: 'Confirmation' }
+    ];
+    
     return (
-      <div className="min-h-screen bg-gray-50 py-12">
-        <div className="container max-w-3xl mx-auto px-4">
-          <div className="bg-white rounded-lg shadow-md p-8">
-            <div className="text-center mb-8">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 text-green-600 mb-4">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
+      <div className="flex justify-center mb-8">
+        {steps.map((step, index) => (
+          <React.Fragment key={step.id}>
+            <div className="flex flex-col items-center">
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                currentStep === step.id 
+                  ? 'bg-ju4u-coral text-white' 
+                  : steps.findIndex(s => s.id === currentStep) > index
+                    ? 'bg-green-500 text-white'
+                    : 'bg-gray-200 text-gray-500'
+              }`}>
+                {steps.findIndex(s => s.id === currentStep) > index ? (
+                  <CheckCircle className="h-5 w-5" />
+                ) : (
+                  index + 1
+                )}
               </div>
-              <h1 className="text-2xl font-bold">Thank You For Your Order!</h1>
-              <p className="text-gray-600 mt-2">
-                Your order has been placed and is being processed.
-              </p>
+              <span className="text-xs mt-1">{step.label}</span>
             </div>
             
-            <div className="bg-gray-50 rounded-md p-6 mb-6">
-              <div className="flex justify-between mb-3">
-                <span className="font-semibold">Order Number:</span>
-                <span>{orderId}</span>
+            {index < steps.length - 1 && (
+              <div className="w-16 h-1 bg-gray-200 self-center mx-2">
+                <div className={`h-full ${
+                  steps.findIndex(s => s.id === currentStep) > index
+                    ? 'bg-green-500'
+                    : 'bg-gray-200'
+                }`} 
+                style={{ 
+                  width: currentStep === step.id 
+                    ? '50%' 
+                    : steps.findIndex(s => s.id === currentStep) > index
+                      ? '100%'
+                      : '0%' 
+                }}></div>
               </div>
-              <div className="flex justify-between">
-                <span className="font-semibold">Order Date:</span>
-                <span>{new Date().toLocaleDateString()}</span>
-              </div>
-            </div>
-            
-            <div className="border-b pb-6 mb-6">
-              <h2 className="font-semibold text-lg mb-4">Order Summary</h2>
-              <div className="space-y-3">
-                {cartItems.map((item) => (
-                  <div key={item.id} className="flex justify-between">
-                    <div className="flex">
-                      <span className="text-gray-700">{item.quantity}x</span>
-                      <span className="ml-2">{item.name}</span>
-                      {item.selectedSize && <span className="ml-2 text-gray-500">Size: {item.selectedSize}</span>}
-                      {item.selectedColor && <span className="ml-2 text-gray-500">Color: {item.selectedColor}</span>}
-                    </div>
-                    <span>${(item.price * item.quantity).toFixed(2)}</span>
-                  </div>
-                ))}
-              </div>
-              
-              <div className="mt-4 pt-4 border-t">
-                <div className="flex justify-between">
-                  <span>Subtotal</span>
-                  <span>${subtotal.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between mt-2">
-                  <span>Shipping</span>
-                  <span>${shipping.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between mt-2">
-                  <span>Tax</span>
-                  <span>${tax.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between mt-3 font-semibold">
-                  <span>Total</span>
-                  <span>${total.toFixed(2)}</span>
-                </div>
-              </div>
-            </div>
-            
-            <div className="flex justify-between mt-8">
-              <Link to="/">
-                <Button variant="outline" className="mr-4">
-                  Continue Shopping
-                </Button>
-              </Link>
-              <Link to="/order-tracking">
-                <Button>
-                  Track Order
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </div>
+            )}
+          </React.Fragment>
+        ))}
       </div>
     );
-  }
-  
-  return (
-    <div className="min-h-screen bg-gray-50 py-12">
-      <div className="container max-w-6xl mx-auto px-4">
-        <div className="mb-8 text-center">
-          <h1 className="text-3xl font-semibold">Checkout</h1>
-          <div className="flex justify-center items-center mt-6">
-            <div className={`flex items-center ${step === 'shipping' ? 'text-ju4u-coral' : 'text-gray-500'}`}>
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 ${step === 'shipping' ? 'border-ju4u-coral' : 'border-gray-300'}`}>
-                <span className="text-sm">1</span>
-              </div>
-              <span className="ml-2">Shipping</span>
-            </div>
-            <div className="w-12 h-0.5 mx-2 bg-gray-200"></div>
-            <div className={`flex items-center ${step === 'payment' ? 'text-ju4u-coral' : 'text-gray-500'}`}>
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 ${step === 'payment' ? 'border-ju4u-coral' : 'border-gray-300'}`}>
-                <span className="text-sm">2</span>
-              </div>
-              <span className="ml-2">Payment</span>
+  };
+
+  // Shipping form
+  const renderShippingForm = () => (
+    <form onSubmit={handleShippingSubmit} className="space-y-6">
+      <div className="bg-white p-6 rounded-lg shadow-sm border">
+        <h2 className="text-xl font-semibold mb-4">Contact Information</h2>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+            <input
+              type="email"
+              id="email"
+              value={shippingInfo.email}
+              onChange={(e) => setShippingInfo({ ...shippingInfo, email: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-ju4u-coral focus:border-ju4u-coral"
+              placeholder="example@email.com"
+              required
+            />
+          </div>
+          <div>
+            <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+            <input
+              type="tel"
+              id="phone"
+              value={shippingInfo.phone}
+              onChange={(e) => setShippingInfo({ ...shippingInfo, phone: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-ju4u-coral focus:border-ju4u-coral"
+              placeholder="(555) 555-5555"
+              required
+            />
+          </div>
+        </div>
+        
+        <h2 className="text-xl font-semibold mb-4 mt-6">Shipping Address</h2>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div>
+            <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+            <input
+              type="text"
+              id="firstName"
+              value={shippingInfo.firstName}
+              onChange={(e) => setShippingInfo({ ...shippingInfo, firstName: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-ju4u-coral focus:border-ju4u-coral"
+              required
+            />
+          </div>
+          <div>
+            <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+            <input
+              type="text"
+              id="lastName"
+              value={shippingInfo.lastName}
+              onChange={(e) => setShippingInfo({ ...shippingInfo, lastName: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-ju4u-coral focus:border-ju4u-coral"
+              required
+            />
+          </div>
+        </div>
+        
+        <div className="mb-4">
+          <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1">Street Address</label>
+          <input
+            type="text"
+            id="address"
+            value={shippingInfo.address}
+            onChange={(e) => setShippingInfo({ ...shippingInfo, address: e.target.value })}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-ju4u-coral focus:border-ju4u-coral"
+            required
+          />
+        </div>
+        
+        <div className="mb-4">
+          <label htmlFor="apartment" className="block text-sm font-medium text-gray-700 mb-1">
+            Apartment, Suite, etc. (optional)
+          </label>
+          <input
+            type="text"
+            id="apartment"
+            value={shippingInfo.apartment}
+            onChange={(e) => setShippingInfo({ ...shippingInfo, apartment: e.target.value })}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-ju4u-coral focus:border-ju4u-coral"
+          />
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+          <div>
+            <label htmlFor="city" className="block text-sm font-medium text-gray-700 mb-1">City</label>
+            <input
+              type="text"
+              id="city"
+              value={shippingInfo.city}
+              onChange={(e) => setShippingInfo({ ...shippingInfo, city: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-ju4u-coral focus:border-ju4u-coral"
+              required
+            />
+          </div>
+          <div>
+            <label htmlFor="state" className="block text-sm font-medium text-gray-700 mb-1">State/Province</label>
+            <input
+              type="text"
+              id="state"
+              value={shippingInfo.state}
+              onChange={(e) => setShippingInfo({ ...shippingInfo, state: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-ju4u-coral focus:border-ju4u-coral"
+              required
+            />
+          </div>
+          <div>
+            <label htmlFor="zipCode" className="block text-sm font-medium text-gray-700 mb-1">ZIP/Postal Code</label>
+            <input
+              type="text"
+              id="zipCode"
+              value={shippingInfo.zipCode}
+              onChange={(e) => setShippingInfo({ ...shippingInfo, zipCode: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-ju4u-coral focus:border-ju4u-coral"
+              required
+            />
+          </div>
+        </div>
+        
+        <div className="mb-4">
+          <label htmlFor="country" className="block text-sm font-medium text-gray-700 mb-1">Country</label>
+          <select
+            id="country"
+            value={shippingInfo.country}
+            onChange={(e) => setShippingInfo({ ...shippingInfo, country: e.target.value })}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-ju4u-coral focus:border-ju4u-coral"
+            required
+          >
+            <option value="United States">United States</option>
+            <option value="Canada">Canada</option>
+            <option value="United Kingdom">United Kingdom</option>
+            <option value="Australia">Australia</option>
+            <option value="Germany">Germany</option>
+            <option value="France">France</option>
+          </select>
+        </div>
+        
+        <div className="flex items-center mt-4">
+          <input
+            type="checkbox"
+            id="saveInfo"
+            checked={shippingInfo.saveInfo}
+            onChange={(e) => setShippingInfo({ ...shippingInfo, saveInfo: e.target.checked })}
+            className="h-4 w-4 text-ju4u-coral focus:ring-ju4u-coral border-gray-300 rounded"
+          />
+          <label htmlFor="saveInfo" className="ml-2 block text-sm text-gray-700">
+            Save this information for next time
+          </label>
+        </div>
+      </div>
+      
+      <div className="flex justify-end">
+        <Button 
+          type="submit" 
+          className="bg-ju4u-coral hover:bg-ju4u-coral/90 flex items-center"
+        >
+          Continue to Payment
+          <ChevronRight className="ml-1 h-4 w-4" />
+        </Button>
+      </div>
+    </form>
+  );
+
+  // Payment form
+  const renderPaymentForm = () => (
+    <form onSubmit={handlePaymentSubmit} className="space-y-6">
+      <div className="bg-white p-6 rounded-lg shadow-sm border">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-semibold">Payment Information</h2>
+          <div className="flex items-center text-xs text-gray-600">
+            <Lock className="h-3 w-3 mr-1" />
+            Secure Payment
+          </div>
+        </div>
+        
+        <div className="flex flex-wrap gap-2 mb-4">
+          <div className="bg-gray-100 rounded px-3 py-2">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa" className="h-6" />
+          </div>
+          <div className="bg-gray-100 rounded px-3 py-2">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard" className="h-6" />
+          </div>
+          <div className="bg-gray-100 rounded px-3 py-2">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" alt="PayPal" className="h-6" />
+          </div>
+          <div className="bg-gray-100 rounded px-3 py-2">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/American_Express_logo_%282018%29.svg" alt="American Express" className="h-6" />
+          </div>
+        </div>
+        
+        <div className="mb-4">
+          <label htmlFor="cardNumber" className="block text-sm font-medium text-gray-700 mb-1">Card Number</label>
+          <div className="relative">
+            <input
+              type="text"
+              id="cardNumber"
+              value={paymentInfo.cardNumber}
+              onChange={handleCardNumberChange}
+              className="w-full pl-3 pr-10 py-2 border border-gray-300 rounded-md focus:ring-ju4u-coral focus:border-ju4u-coral"
+              placeholder="1234 5678 9012 3456"
+              maxLength={19}
+              required
+            />
+            <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+              <CreditCardIcon className="h-5 w-5 text-gray-400" />
             </div>
           </div>
         </div>
         
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Shipping/Payment Form */}
-          <div className="lg:col-span-2">
-            <div className="bg-white rounded-lg shadow-md p-6">
-              {step === 'shipping' && (
-                <form onSubmit={handleContinueToPayment}>
-                  <h2 className="text-xl font-semibold mb-4">Shipping Information</h2>
-                  
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                    <div>
-                      <Label htmlFor="firstName" className="mb-1 block">First Name*</Label>
-                      <Input
-                        id="firstName"
-                        name="firstName"
-                        value={shippingInfo.firstName}
-                        onChange={handleShippingInfoChange}
-                        required
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="lastName" className="mb-1 block">Last Name*</Label>
-                      <Input
-                        id="lastName"
-                        name="lastName"
-                        value={shippingInfo.lastName}
-                        onChange={handleShippingInfoChange}
-                        required
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                    <div>
-                      <Label htmlFor="email" className="mb-1 block">Email*</Label>
-                      <Input
-                        type="email"
-                        id="email"
-                        name="email"
-                        value={shippingInfo.email}
-                        onChange={handleShippingInfoChange}
-                        required
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="phone" className="mb-1 block">Phone*</Label>
-                      <Input
-                        id="phone"
-                        name="phone"
-                        value={shippingInfo.phone}
-                        onChange={handleShippingInfoChange}
-                        required
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="mb-4">
-                    <Label htmlFor="address" className="mb-1 block">Address*</Label>
-                    <Input
-                      id="address"
-                      name="address"
-                      value={shippingInfo.address}
-                      onChange={handleShippingInfoChange}
-                      required
-                    />
-                  </div>
-                  
-                  <div className="mb-4">
-                    <Label htmlFor="apartment" className="mb-1 block">Apartment, suite, etc. (optional)</Label>
-                    <Input
-                      id="apartment"
-                      name="apartment"
-                      value={shippingInfo.apartment}
-                      onChange={handleShippingInfoChange}
-                    />
-                  </div>
-                  
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
-                    <div>
-                      <Label htmlFor="city" className="mb-1 block">City*</Label>
-                      <Input
-                        id="city"
-                        name="city"
-                        value={shippingInfo.city}
-                        onChange={handleShippingInfoChange}
-                        required
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="state" className="mb-1 block">State/Province*</Label>
-                      <Input
-                        id="state"
-                        name="state"
-                        value={shippingInfo.state}
-                        onChange={handleShippingInfoChange}
-                        required
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="zipCode" className="mb-1 block">ZIP/Postal Code*</Label>
-                      <Input
-                        id="zipCode"
-                        name="zipCode"
-                        value={shippingInfo.zipCode}
-                        onChange={handleShippingInfoChange}
-                        required
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="mb-6">
-                    <Label htmlFor="country" className="mb-1 block">Country*</Label>
-                    <select
-                      id="country"
-                      name="country"
-                      className="w-full border border-gray-300 rounded-md px-3 py-2"
-                      value={shippingInfo.country}
-                      onChange={handleShippingInfoChange}
-                      required
-                    >
-                      <option value="US">United States</option>
-                      <option value="CA">Canada</option>
-                      <option value="UK">United Kingdom</option>
-                      <option value="AU">Australia</option>
-                    </select>
-                  </div>
-                  
-                  <div className="mb-6">
-                    <div className="flex items-center">
-                      <Checkbox
-                        id="saveInfo"
-                        checked={shippingInfo.saveInfo}
-                        onCheckedChange={(checked) => 
-                          setShippingInfo(prev => ({ ...prev, saveInfo: checked === true }))
-                        }
-                      />
-                      <label htmlFor="saveInfo" className="ml-2 text-sm">
-                        Save this information for faster checkout next time
-                      </label>
-                    </div>
-                  </div>
-                  
-                  <div className="pt-4 border-t">
-                    <h3 className="text-lg font-semibold mb-4">Shipping Method</h3>
-                    <RadioGroup
-                      value={shippingMethod}
-                      onValueChange={setShippingMethod}
-                      className="space-y-4"
-                    >
-                      <div className="flex items-center justify-between border rounded-md p-4">
-                        <div className="flex items-center">
-                          <RadioGroupItem id="standard" value="standard" className="mr-3" />
-                          <div>
-                            <Label htmlFor="standard" className="font-medium">Standard Shipping</Label>
-                            <p className="text-sm text-gray-500">3-5 business days</p>
-                          </div>
-                        </div>
-                        <span className="font-medium">$4.99</span>
-                      </div>
-                      <div className="flex items-center justify-between border rounded-md p-4">
-                        <div className="flex items-center">
-                          <RadioGroupItem id="express" value="express" className="mr-3" />
-                          <div>
-                            <Label htmlFor="express" className="font-medium">Express Shipping</Label>
-                            <p className="text-sm text-gray-500">1-2 business days</p>
-                          </div>
-                        </div>
-                        <span className="font-medium">$14.99</span>
-                      </div>
-                    </RadioGroup>
-                  </div>
-                  
-                  <div className="mt-8 text-right">
-                    <Button type="submit">
-                      Continue to Payment
-                    </Button>
-                  </div>
-                </form>
-              )}
-              
-              {step === 'payment' && (
-                <form onSubmit={handlePlaceOrder}>
-                  <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-xl font-semibold">Payment Information</h2>
-                    <button
-                      type="button"
-                      className="text-sm text-ju4u-coral"
-                      onClick={() => setStep('shipping')}
-                    >
-                      Edit Shipping
-                    </button>
-                  </div>
-                  
-                  <div className="mb-6">
-                    <Label htmlFor="cardNumber" className="mb-1 block">Card Number*</Label>
-                    <Input
-                      id="cardNumber"
-                      name="cardNumber"
-                      placeholder="1234 5678 9012 3456"
-                      value={paymentInfo.cardNumber}
-                      onChange={handlePaymentInfoChange}
-                      required
-                    />
-                  </div>
-                  
-                  <div className="mb-6">
-                    <Label htmlFor="nameOnCard" className="mb-1 block">Name on Card*</Label>
-                    <Input
-                      id="nameOnCard"
-                      name="nameOnCard"
-                      value={paymentInfo.nameOnCard}
-                      onChange={handlePaymentInfoChange}
-                      required
-                    />
-                  </div>
-                  
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-                    <div>
-                      <Label htmlFor="expiryDate" className="mb-1 block">Expiry Date*</Label>
-                      <Input
-                        id="expiryDate"
-                        name="expiryDate"
-                        placeholder="MM / YY"
-                        value={paymentInfo.expiryDate}
-                        onChange={handlePaymentInfoChange}
-                        required
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="cvv" className="mb-1 block">CVV*</Label>
-                      <Input
-                        id="cvv"
-                        name="cvv"
-                        placeholder="123"
-                        value={paymentInfo.cvv}
-                        onChange={handlePaymentInfoChange}
-                        required
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="mb-8">
-                    <div className="flex items-center">
-                      <Checkbox
-                        id="saveCard"
-                        checked={paymentInfo.saveCard}
-                        onCheckedChange={(checked) =>
-                          setPaymentInfo(prev => ({ ...prev, saveCard: checked === true }))
-                        }
-                      />
-                      <label htmlFor="saveCard" className="ml-2 text-sm">
-                        Save this card for future purchases
-                      </label>
-                    </div>
-                  </div>
-                  
-                  <div className="mt-8 text-right">
-                    <Button 
-                      type="submit" 
-                      className="w-full sm:w-auto"
-                      disabled={isProcessing}
-                    >
-                      {isProcessing ? (
-                        <span className="flex items-center justify-center">
-                          <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                          </svg>
-                          Processing...
-                        </span>
-                      ) : (
-                        'Place Order'
-                      )}
-                    </Button>
-                  </div>
-                </form>
-              )}
+        <div className="mb-4">
+          <label htmlFor="cardName" className="block text-sm font-medium text-gray-700 mb-1">Name on Card</label>
+          <input
+            type="text"
+            id="cardName"
+            value={paymentInfo.cardName}
+            onChange={(e) => setPaymentInfo({ ...paymentInfo, cardName: e.target.value })}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-ju4u-coral focus:border-ju4u-coral"
+            placeholder="John Smith"
+            required
+          />
+        </div>
+        
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label htmlFor="expDate" className="block text-sm font-medium text-gray-700 mb-1">Expiration Date</label>
+            <div className="relative">
+              <input
+                type="text"
+                id="expDate"
+                value={paymentInfo.expDate}
+                onChange={handleExpDateChange}
+                className="w-full pl-3 pr-10 py-2 border border-gray-300 rounded-md focus:ring-ju4u-coral focus:border-ju4u-coral"
+                placeholder="MM/YY"
+                maxLength={5}
+                required
+              />
+              <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                <Calendar className="h-4 w-4 text-gray-400" />
+              </div>
             </div>
           </div>
-          
-          {/* Order Summary */}
           <div>
-            <div className="bg-white rounded-lg shadow-md p-6 sticky top-6">
-              <h2 className="text-lg font-semibold mb-4 flex items-center">
-                <Truck className="mr-2 h-5 w-5" />
-                Order Summary
-              </h2>
+            <label htmlFor="cvv" className="block text-sm font-medium text-gray-700 mb-1">Security Code (CVV)</label>
+            <input
+              type="text"
+              id="cvv"
+              value={paymentInfo.cvv}
+              onChange={(e) => setPaymentInfo({ ...paymentInfo, cvv: e.target.value.replace(/\D/g, '').slice(0, 3) })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-ju4u-coral focus:border-ju4u-coral"
+              placeholder="123"
+              maxLength={3}
+              required
+            />
+          </div>
+        </div>
+        
+        <div className="flex items-center mt-4">
+          <input
+            type="checkbox"
+            id="saveCard"
+            checked={paymentInfo.saveCard}
+            onChange={(e) => setPaymentInfo({ ...paymentInfo, saveCard: e.target.checked })}
+            className="h-4 w-4 text-ju4u-coral focus:ring-ju4u-coral border-gray-300 rounded"
+          />
+          <label htmlFor="saveCard" className="ml-2 block text-sm text-gray-700">
+            Save card for future purchases
+          </label>
+        </div>
+      </div>
+      
+      <div className="bg-white p-6 rounded-lg shadow-sm border">
+        <h2 className="text-xl font-semibold mb-4">Billing Address</h2>
+        
+        <div className="flex items-center mb-4">
+          <input
+            type="radio"
+            id="sameAsShipping"
+            name="billingOption"
+            className="h-4 w-4 text-ju4u-coral focus:ring-ju4u-coral border-gray-300"
+            defaultChecked
+          />
+          <label htmlFor="sameAsShipping" className="ml-2 block text-sm text-gray-700">
+            Same as shipping address
+          </label>
+        </div>
+        
+        <div className="flex items-center">
+          <input
+            type="radio"
+            id="differentBilling"
+            name="billingOption"
+            className="h-4 w-4 text-ju4u-coral focus:ring-ju4u-coral border-gray-300"
+          />
+          <label htmlFor="differentBilling" className="ml-2 block text-sm text-gray-700">
+            Use different billing address
+          </label>
+        </div>
+      </div>
+      
+      <div className="flex justify-between">
+        <Button 
+          type="button"
+          variant="outline"
+          className="flex items-center"
+          onClick={() => setCurrentStep('shipping')}
+        >
+          <X className="mr-1 h-4 w-4" />
+          Back to Shipping
+        </Button>
+        <Button 
+          type="submit" 
+          className="bg-ju4u-coral hover:bg-ju4u-coral/90 flex items-center"
+          disabled={isProcessing}
+        >
+          {isProcessing ? (
+            <>Processing...</>
+          ) : (
+            <>
+              Complete Order
+              <ChevronRight className="ml-1 h-4 w-4" />
+            </>
+          )}
+        </Button>
+      </div>
+    </form>
+  );
+
+  // Order confirmation
+  const renderConfirmation = () => (
+    <div className="text-center">
+      <div className="bg-white p-8 rounded-lg shadow-sm border mb-6">
+        <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <CheckCircle className="h-8 w-8 text-green-600" />
+        </div>
+        <h2 className="text-2xl font-bold mb-2">Order Confirmed!</h2>
+        <p className="text-gray-600 mb-6">
+          Thank you for your purchase. Your order has been received and is being processed.
+        </p>
+        
+        <div className="bg-gray-50 p-4 rounded-lg mb-6">
+          <div className="flex flex-col md:flex-row justify-between items-center">
+            <div>
+              <p className="text-sm text-gray-500">Order Number</p>
+              <p className="font-semibold">{orderId}</p>
+            </div>
+            <div className="mt-2 md:mt-0">
+              <Button 
+                variant="outline"
+                className="text-xs"
+                onClick={() => navigate(`/order-tracking`)}
+              >
+                Track Order
+              </Button>
+            </div>
+          </div>
+        </div>
+        
+        <div className="text-left border-t pt-4">
+          <h3 className="font-semibold mb-2">Order Details</h3>
+          
+          <div className="space-y-4 mb-4">
+            {sampleCartItems.map(item => (
+              <div key={item.id} className="flex items-center">
+                <div className="h-12 w-12 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
+                  <img 
+                    src={item.images[0]} 
+                    alt={item.name} 
+                    className="h-full w-full object-cover object-center"
+                  />
+                </div>
+                <div className="ml-3 flex flex-1 flex-col text-sm">
+                  <p className="font-medium">{item.name}</p>
+                  <p className="text-gray-500">
+                    {item.selectedSize && `Size: ${item.selectedSize}`}
+                    {item.selectedSize && item.selectedColor && ', '}
+                    {item.selectedColor && `Color: ${item.selectedColor}`}
+                  </p>
+                </div>
+                <div className="text-right">
+                  <p className="font-medium">${item.price.toFixed(2)}</p>
+                  <p className="text-xs text-gray-500">Qty: {item.quantity}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+          
+          <div className="border-t pt-4 space-y-2">
+            <div className="flex justify-between text-sm">
+              <p className="text-gray-600">Subtotal</p>
+              <p>${subtotal.toFixed(2)}</p>
+            </div>
+            <div className="flex justify-between text-sm">
+              <p className="text-gray-600">Shipping</p>
+              <p>{shipping > 0 ? `$${shipping.toFixed(2)}` : 'Free'}</p>
+            </div>
+            <div className="flex justify-between text-sm">
+              <p className="text-gray-600">Tax</p>
+              <p>${tax.toFixed(2)}</p>
+            </div>
+            <div className="flex justify-between font-bold mt-2 pt-2 border-t">
+              <p>Total</p>
+              <p>${total.toFixed(2)}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div className="flex flex-col sm:flex-row justify-center space-y-3 sm:space-y-0 sm:space-x-4">
+        <Button 
+          variant="outline"
+          className="flex items-center justify-center"
+          onClick={() => navigate('/order-tracking')}
+        >
+          <Truck className="mr-2 h-4 w-4" />
+          Track Your Order
+        </Button>
+        <Button 
+          className="bg-ju4u-black hover:bg-black flex items-center justify-center"
+          onClick={() => navigate('/')}
+        >
+          <ShoppingBag className="mr-2 h-4 w-4" />
+          Continue Shopping
+        </Button>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="container max-w-7xl mx-auto px-4 py-8 md:py-12">
+      <h1 className="text-3xl md:text-4xl font-bold mb-8 text-center">Checkout</h1>
+      
+      {renderStepIndicator()}
+      
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Main content */}
+        <div className="lg:col-span-2">
+          {currentStep === 'shipping' && renderShippingForm()}
+          {currentStep === 'payment' && renderPaymentForm()}
+          {currentStep === 'confirmation' && renderConfirmation()}
+        </div>
+        
+        {/* Order summary */}
+        {currentStep !== 'confirmation' && (
+          <div className="lg:col-span-1">
+            <div className="bg-white p-6 rounded-lg shadow-sm border sticky top-24">
+              <h2 className="text-lg font-semibold mb-6 pb-4 border-b">Order Summary</h2>
               
-              <div className="space-y-4 mb-6">
-                {cartItems.map((item) => (
-                  <div key={item.id} className="flex gap-3">
-                    <div className="flex-shrink-0 w-16 h-16 bg-gray-100 rounded overflow-hidden">
+              <div className="space-y-4 max-h-80 overflow-y-auto mb-6">
+                {sampleCartItems.map(item => (
+                  <div key={item.id} className="flex items-center">
+                    <div className="h-16 w-16 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
                       <img 
                         src={item.images[0]} 
                         alt={item.name} 
-                        className="w-full h-full object-cover"
+                        className="h-full w-full object-cover object-center"
                       />
                     </div>
-                    <div className="flex-grow">
-                      <p className="font-medium">{item.name}</p>
-                      <div className="text-sm text-gray-600 mt-1">
-                        <span>{item.quantity} × ${item.price.toFixed(2)}</span>
-                        {item.selectedSize && <span className="ml-2">Size: {item.selectedSize}</span>}
-                        {item.selectedColor && <span className="ml-2">Color: {item.selectedColor}</span>}
-                      </div>
+                    <div className="ml-3 flex flex-1 flex-col">
+                      <p className="text-sm font-medium">{item.name}</p>
+                      <p className="text-xs text-gray-500">
+                        {item.selectedSize && `Size: ${item.selectedSize}`}
+                        {item.selectedSize && item.selectedColor && ', '}
+                        {item.selectedColor && `Color: ${item.selectedColor}`}
+                      </p>
+                      <p className="text-xs text-gray-500">Qty: {item.quantity}</p>
                     </div>
+                    <p className="text-sm font-medium">${item.price.toFixed(2)}</p>
                   </div>
                 ))}
               </div>
               
-              <Separator className="my-4" />
-              
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Subtotal</span>
-                  <span>${subtotal.toFixed(2)}</span>
+              <div className="space-y-2 pt-4 border-t">
+                <div className="flex justify-between text-sm">
+                  <p className="text-gray-600">Subtotal</p>
+                  <p>${subtotal.toFixed(2)}</p>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Shipping</span>
-                  <span>${shipping.toFixed(2)}</span>
+                <div className="flex justify-between text-sm">
+                  <p className="text-gray-600">Shipping</p>
+                  <p>{shipping > 0 ? `$${shipping.toFixed(2)}` : 'Free'}</p>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Tax</span>
-                  <span>${tax.toFixed(2)}</span>
+                <div className="flex justify-between text-sm mb-4">
+                  <p className="text-gray-600">Tax</p>
+                  <p>${tax.toFixed(2)}</p>
+                </div>
+                <div className="flex justify-between text-base font-semibold">
+                  <p>Total</p>
+                  <p>${total.toFixed(2)}</p>
                 </div>
               </div>
               
-              <div className="flex justify-between font-medium text-lg mt-4 pt-4 border-t">
-                <span>Total</span>
-                <span>${total.toFixed(2)}</span>
-              </div>
+              {currentStep === 'payment' && (
+                <div className="mt-6 flex items-center justify-center text-xs text-gray-500">
+                  <Lock className="h-3 w-3 mr-1" />
+                  <span>Payments are secure and encrypted</span>
+                </div>
+              )}
             </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
