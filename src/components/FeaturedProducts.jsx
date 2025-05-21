@@ -1,10 +1,11 @@
 
 import React from 'react';
+import { Link } from 'react-router-dom';
 import ProductCard from './ProductCard';
 import { Button } from '@/components/ui/button';
-import { Link } from 'react-router-dom';
+import { ChevronRight } from 'lucide-react';
 
-// Sample featured products data
+// Sample product data
 const featuredProducts = [
   {
     id: '1',
@@ -59,6 +60,7 @@ const featuredProducts = [
     id: '4',
     name: 'High-Waisted Trousers',
     price: 119.99,
+    discount: 15,
     images: [
       'https://images.unsplash.com/photo-1548624313-0396965c11f3?q=80&w=2070',
       'https://images.unsplash.com/photo-1548624313-0396965c11f3?q=80&w=2070'
@@ -68,33 +70,31 @@ const featuredProducts = [
     sizes: ['XS', 'S', 'M', 'L'],
     colors: ['Black', 'Navy', 'Beige'],
     brand: 'JU4U Collection',
-    inStock: true,
-    featured: true,
-    discount: 15
+    inStock: true
   }
 ];
 
-const FeaturedProducts = ({ 
-  title = "Featured Products",
-  subtitle = "Handpicked for your unique style"
-}) => {
+const FeaturedProducts = () => {
   return (
-    <section className="py-16 bg-white">
+    <section className="py-12 md:py-16">
       <div className="container max-w-7xl mx-auto px-4">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold mb-3">{title}</h2>
-          <p className="text-gray-600 max-w-lg mx-auto">{subtitle}</p>
+        <div className="flex justify-between items-center mb-8">
+          <h2 className="text-2xl md:text-3xl font-bold">Featured Products</h2>
+          <Link to="/catalog" className="text-ju4u-coral flex items-center hover:underline">
+            View All
+            <ChevronRight className="h-4 w-4 ml-1" />
+          </Link>
         </div>
         
-        <div className="product-container">
-          {featuredProducts.map((product) => (
+        <div className="product-container mb-8">
+          {featuredProducts.map(product => (
             <ProductCard key={product.id} product={product} />
           ))}
         </div>
         
-        <div className="text-center mt-12">
+        <div className="text-center">
           <Link to="/catalog">
-            <Button className="btn-outline">View All Products</Button>
+            <Button variant="outline">Shop All Products</Button>
           </Link>
         </div>
       </div>

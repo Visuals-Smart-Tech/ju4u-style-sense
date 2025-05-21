@@ -1,27 +1,11 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { X } from 'lucide-react'; // Import the required icon
+import { Heart, Share, ChevronRight, Star, Minus, Plus, ShoppingBag, X } from 'lucide-react'; // Added X icon
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
-import { 
-  Breadcrumb, 
-  BreadcrumbList, 
-  BreadcrumbItem, 
-  BreadcrumbSeparator, 
-  BreadcrumbLink 
-} from '@/components/ui/breadcrumb';
-import { AspectRatio } from '@/components/ui/aspect-ratio';
-import { toast } from '@/hooks/use-toast';
-import { 
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
+import ProductCard from '@/components/ProductCard';
+import FitAssistant from '@/components/FitAssistant';
+import VirtualTryOn from '@/components/VirtualTryOn';
+import { toast } from '@/components/ui/sonner';
 
 // Product data (mock data for this specific product)
 const productData = {

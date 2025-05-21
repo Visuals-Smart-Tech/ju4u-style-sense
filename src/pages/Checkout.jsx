@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -8,7 +7,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Separator } from '@/components/ui/separator';
 import { toast } from '@/hooks/use-toast';
-import { Truck } from 'lucide-react'; // Import the required icon
+import { Truck, X } from 'lucide-react'; // Added missing Truck icon import
 
 const Checkout = () => {
   const [step, setStep] = useState('shipping');
