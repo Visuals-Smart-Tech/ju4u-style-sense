@@ -63,16 +63,16 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				// Custom JU4U colors
+				// Updated JU4U colors with new accent coral
 				ju4u: {
 					black: '#111111',
-					coral: '#FF6B6B',
+					coral: '#FF4D4F',
 					white: '#FFFFFF',
 					gray: '#F7F7F7',
 				}
 			},
 			fontFamily: {
-				rubik: ['Rubik', 'sans-serif'],
+				inter: ['Inter', 'sans-serif'],
 				comfortaa: ['Comfortaa', 'sans-serif'],
 				cabin: ['Cabin', 'sans-serif'],
 				josefin: ['"Josefin Sans"', 'sans-serif'],
@@ -110,6 +110,14 @@ export default {
 				scaleIn: {
 					'0%': { transform: 'scale(0.95)', opacity: '0' },
 					'100%': { transform: 'scale(1)', opacity: '1' }
+				},
+				expandLogo: {
+					'0%': { width: 'auto', opacity: '0' },
+					'100%': { width: 'auto', opacity: '1' }
+				},
+				fadeInSlide: {
+					'0%': { transform: 'translateX(-10px)', opacity: '0' },
+					'100%': { transform: 'translateX(0)', opacity: '1' }
 				}
 			},
 			animation: {
@@ -117,7 +125,9 @@ export default {
 				'accordion-up': 'accordion-up 0.2s ease-out',
 				'fade-in': 'fadeIn 0.4s ease-in-out',
 				'slide-up': 'slideUp 0.5s ease-in-out',
-				'scale-in': 'scaleIn 0.3s ease-in-out'
+				'scale-in': 'scaleIn 0.3s ease-in-out',
+				'expand-logo': 'expandLogo 0.3s ease-in-out forwards',
+				'fade-in-slide': 'fadeInSlide 0.3s ease-in-out forwards'
 			}
 		}
 	},

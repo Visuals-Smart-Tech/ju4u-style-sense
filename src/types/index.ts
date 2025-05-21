@@ -55,4 +55,6 @@ export type ProductCategory =
   | 'shoes' 
   | 'bags' 
   | 'jewelry'
-  | 'sale';
+  | 'sale'
+  | 'all'
+  | 'new';

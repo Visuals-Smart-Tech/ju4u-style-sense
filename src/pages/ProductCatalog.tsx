@@ -139,7 +139,8 @@ const allProducts: Product[] = [
 ];
 
 const ProductCatalog = () => {
-  const { category } = useParams<{ category?: ProductCategory }>();
+  // We're now using the updated ProductCategory type that includes 'all', 'new', and 'sale'
+  const { category } = useParams<{ category?: string }>();
   const [products, setProducts] = useState<Product[]>([]);
   const [filters, setFilters] = useState({
     priceRange: [0, 300],
@@ -162,15 +163,13 @@ const ProductCatalog = () => {
     let filtered = [...allProducts];
     
     if (category && category !== 'all') {
-      filtered = filtered.filter(p => p.category === category);
-    }
-    
-    if (category === 'sale') {
-      filtered = allProducts.filter(p => p.discount && p.discount > 0);
-    }
-    
-    if (category === 'new') {
-      filtered = allProducts.filter(p => p.new);
+      if (category === 'sale') {
+        filtered = allProducts.filter(p => p.discount && p.discount > 0);
+      } else if (category === 'new') {
+        filtered = allProducts.filter(p => p.new);
+      } else {
+        filtered = filtered.filter(p => p.category === category);
+      }
     }
     
     // Apply filters
@@ -259,9 +258,10 @@ const ProductCatalog = () => {
   };
   
   const getCategoryTitle = () => {
+    if (!category || category === 'all') return "All Products";
     if (category === 'sale') return "Sale Items";
     if (category === 'new') return "New Arrivals";
-    return category ? `${category.charAt(0).toUpperCase() + category.slice(1)}` : "All Products";
+    return category.charAt(0).toUpperCase() + category.slice(1);
   };
 
   return (

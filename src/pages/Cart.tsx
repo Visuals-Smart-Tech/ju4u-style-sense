@@ -255,12 +255,14 @@ const Cart = () => {
               )}
               
               {/* Checkout Button */}
-              <Button 
-                className="w-full flex items-center justify-center bg-ju4u-black hover:bg-black py-6"
-              >
-                Proceed to Checkout
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
+              <Link to="/checkout">
+                <Button 
+                  className="w-full flex items-center justify-center bg-ju4u-coral hover:bg-opacity-90 py-6"
+                >
+                  Proceed to Checkout
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </Link>
               
               {/* Payment Methods */}
               <div className="mt-6 flex justify-center space-x-2">

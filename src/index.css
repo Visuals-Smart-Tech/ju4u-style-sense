@@ -1,5 +1,5 @@
 
-@import url('https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;500;600;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Cabin:wght@400;500;600;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;500;600;700&display=swap');
@@ -28,7 +28,7 @@
     --muted: 0 0% 97%;
     --muted-foreground: 0 0% 45%;
 
-    --accent: 0 74% 70%;
+    --accent: 0 92% 65%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84.2% 60.2%;
@@ -60,7 +60,7 @@
     --muted: 0 0% 15%;
     --muted-foreground: 0 0% 65%;
 
-    --accent: 0 74% 70%;
+    --accent: 0 92% 65%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 62.8% 30.6%;
@@ -78,11 +78,11 @@
   }
 
   body {
-    @apply bg-background text-foreground font-rubik;
+    @apply bg-background text-foreground font-inter;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-josefin font-medium tracking-wide;
+    @apply font-inter font-medium tracking-wide;
   }
 }
 
@@ -93,7 +93,7 @@
   }
   
   .btn-accent {
-    @apply bg-ju4u-coral text-white hover:bg-[#ff5757] transition-colors duration-300 rounded-md font-medium py-2 px-4;
+    @apply bg-ju4u-coral text-white hover:brightness-95 transition-colors duration-300 rounded-md font-medium py-2 px-4;
   }
   
   .btn-outline {
@@ -101,10 +101,75 @@
   }
 
   .product-container {
-    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6;
+    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6;
   }
   
   .product-card-hover {
-    @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
+    @apply transition-all duration-300 hover:shadow-md hover:-translate-y-1;
+  }
+
+  /* Navbar dropdown */
+  .nav-dropdown {
+    @apply absolute top-full left-0 bg-white shadow-lg rounded-md w-48 py-2 z-50 invisible opacity-0 translate-y-2 transition-all duration-200 overflow-hidden;
+  }
+
+  .group:hover .nav-dropdown {
+    @apply visible opacity-100 translate-y-0;
+  }
+
+  .nav-dropdown-item {
+    @apply block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-ju4u-coral transition-colors duration-150;
+  }
+
+  /* Search animation */
+  .search-input {
+    @apply transition-all duration-300 ease-in-out focus:w-48 w-32 sm:w-40 sm:focus:w-60;
+  }
+
+  /* Section spacing - tighter than before */
+  .section-padding {
+    @apply py-8 md:py-12;
+  }
+
+  /* Logo expansion animation container */
+  .logo-container {
+    @apply relative inline-flex items-center;
+  }
+
+  .logo-text-hidden {
+    @apply opacity-0 max-w-0 overflow-hidden transition-all duration-300 whitespace-nowrap;
+  }
+
+  .logo-container:hover .logo-text-hidden {
+    @apply opacity-100 max-w-xs;
+  }
+
+  /* AI assistant */
+  .ai-assistant-bubble {
+    @apply fixed bottom-6 right-6 w-14 h-14 bg-ju4u-coral text-white rounded-full shadow-lg flex items-center justify-center cursor-pointer z-40 transition-transform duration-300 hover:scale-110;
+  }
+
+  .ai-assistant-panel {
+    @apply fixed bottom-24 right-6 w-80 md:w-96 bg-white rounded-lg shadow-xl z-40 overflow-hidden transition-all duration-300 max-h-[500px] flex flex-col;
+  }
+}
+
+/* Voice search listening animation */
+.voice-listening {
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
   }
 }
