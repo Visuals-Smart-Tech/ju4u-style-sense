@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,7 +62,20 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				// Custom JU4U colors
+				ju4u: {
+					black: '#111111',
+					coral: '#FF6B6B',
+					white: '#FFFFFF',
+					gray: '#F7F7F7',
 				}
+			},
+			fontFamily: {
+				rubik: ['Rubik', 'sans-serif'],
+				comfortaa: ['Comfortaa', 'sans-serif'],
+				cabin: ['Cabin', 'sans-serif'],
+				josefin: ['"Josefin Sans"', 'sans-serif'],
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
@@ -84,11 +98,26 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				fadeIn: {
+					'0%': { opacity: '0' },
+					'100%': { opacity: '1' }
+				},
+				slideUp: {
+					'0%': { transform: 'translateY(20px)', opacity: '0' },
+					'100%': { transform: 'translateY(0)', opacity: '1' }
+				},
+				scaleIn: {
+					'0%': { transform: 'scale(0.95)', opacity: '0' },
+					'100%': { transform: 'scale(1)', opacity: '1' }
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'fade-in': 'fadeIn 0.4s ease-in-out',
+				'slide-up': 'slideUp 0.5s ease-in-out',
+				'scale-in': 'scaleIn 0.3s ease-in-out'
 			}
 		}
 	},
