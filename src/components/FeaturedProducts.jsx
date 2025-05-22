@@ -1,7 +1,9 @@
+
 import React from 'react';
 import ProductCard from './ProductCard';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
+import { ArrowRight } from 'lucide-react';
 
 // Sample featured products data
 const featuredProducts = [
@@ -78,11 +80,18 @@ const FeaturedProducts = ({
 	subtitle = 'Handpicked for your unique style',
 }) => {
 	return (
-		<section className="py-16 bg-white">
+		<section className="section-padding bg-white">
 			<div className="container max-w-7xl mx-auto px-4">
-				<div className="text-center mb-12">
-					<h2 className="text-3xl md:text-4xl font-bold mb-3">{title}</h2>
-					<p className="text-gray-600 max-w-lg mx-auto">{subtitle}</p>
+				<div className="flex flex-col md:flex-row md:items-end md:justify-between mb-12">
+					<div>
+						<span className="text-ju4u-coral font-medium uppercase tracking-wider text-sm block mb-2">Collection</span>
+						<h2 className="text-3xl md:text-4xl font-rubik font-bold mb-2">{title}</h2>
+						<p className="text-gray-600">{subtitle}</p>
+					</div>
+					<Link to="/catalog" className="hidden md:flex items-center mt-4 md:mt-0 group">
+						<span className="font-medium mr-2 group-hover:text-ju4u-coral transition-colors">View All</span>
+						<ArrowRight className="h-4 w-4 transform group-hover:translate-x-1 transition-transform" />
+					</Link>
 				</div>
 
 				<div className="product-container">
@@ -91,9 +100,12 @@ const FeaturedProducts = ({
 					))}
 				</div>
 
-				<div className="text-center mt-12">
+				<div className="text-center mt-12 md:hidden">
 					<Link to="/catalog">
-						<Button className="btn-outline">View All Products</Button>
+						<Button className="btn-outline inline-flex items-center gap-2">
+							View All Products
+							<ArrowRight className="h-4 w-4" />
+						</Button>
 					</Link>
 				</div>
 			</div>

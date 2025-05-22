@@ -1,7 +1,7 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;500;600;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Cabin:wght@400;500;600;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;500;600;700&display=swap');
 
 @tailwind base;
@@ -28,7 +28,7 @@
     --muted: 0 0% 97%;
     --muted-foreground: 0 0% 45%;
 
-    --accent: 0 92% 65%;
+    --accent: 0 92% 70%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84.2% 60.2%;
@@ -60,7 +60,7 @@
     --muted: 0 0% 15%;
     --muted-foreground: 0 0% 65%;
 
-    --accent: 0 92% 65%;
+    --accent: 0 92% 70%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 62.8% 30.6%;
@@ -78,34 +78,67 @@
   }
 
   body {
-    @apply bg-background text-foreground font-inter;
+    @apply bg-background text-foreground font-rubik antialiased;
   }
 
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-inter font-medium tracking-wide;
+  /* Typography hierarchy based on design guidelines */
+  h1 {
+    @apply text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight mb-4;
+  }
+
+  h2 {
+    @apply text-2xl md:text-3xl font-semibold tracking-normal mb-3;
+  }
+
+  h3 {
+    @apply text-xl font-medium tracking-normal mb-2;
+  }
+
+  h4 {
+    @apply text-lg font-medium tracking-normal mb-2;
+  }
+
+  p {
+    @apply text-base leading-relaxed;
+  }
+
+  a {
+    @apply transition-colors duration-200;
+  }
+
+  /* Form elements */
+  input, select, textarea {
+    @apply text-base;
+  }
+
+  button {
+    @apply font-medium transition-all duration-200;
   }
 }
 
 /* Custom utility classes */
 @layer components {
+  /* Buttons */
   .btn-primary {
-    @apply bg-ju4u-black text-white hover:bg-black transition-colors duration-300 rounded-md font-medium py-2 px-4;
+    @apply bg-ju4u-black text-white hover:bg-black transition-all duration-300 rounded-md font-medium py-2 px-4 transform hover:-translate-y-0.5 hover:shadow-md;
   }
   
   .btn-accent {
-    @apply bg-ju4u-coral text-white hover:brightness-95 transition-colors duration-300 rounded-md font-medium py-2 px-4;
+    @apply bg-ju4u-coral text-white hover:brightness-95 transition-all duration-300 rounded-md font-medium py-2 px-4 transform hover:-translate-y-0.5 hover:shadow-md;
   }
   
   .btn-outline {
-    @apply border-2 border-ju4u-black text-ju4u-black hover:bg-ju4u-black hover:text-white transition-colors duration-300 rounded-md font-medium py-1.5 px-3.5;
+    @apply border-2 border-ju4u-black text-ju4u-black hover:bg-ju4u-black hover:text-white transition-all duration-300 rounded-md font-medium py-1.5 px-3.5 transform hover:-translate-y-0.5 hover:shadow-md;
   }
 
+  /* Product grid */
   .product-container {
     @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6;
   }
   
+  /* Card hover effects */
   .product-card-hover {
-    @apply transition-all duration-300 hover:shadow-md hover:-translate-y-1;
+    @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1 rounded-lg overflow-hidden;
   }
 
   /* Navbar dropdown */
@@ -126,22 +159,22 @@
     @apply transition-all duration-300 ease-in-out focus:w-48 w-32 sm:w-40 sm:focus:w-60;
   }
 
-  /* Section spacing - tighter than before */
+  /* Section spacing */
   .section-padding {
-    @apply py-8 md:py-12;
+    @apply py-10 md:py-16;
   }
 
   /* Logo expansion animation container */
   .logo-container {
-    @apply relative inline-flex items-center;
+    @apply relative inline-flex items-center overflow-hidden;
   }
 
   .logo-text-hidden {
-    @apply opacity-0 max-w-0 overflow-hidden transition-all duration-300 whitespace-nowrap;
+    @apply w-0 max-w-0 overflow-hidden transition-all duration-300 whitespace-nowrap;
   }
 
   .logo-container:hover .logo-text-hidden {
-    @apply opacity-100 max-w-xs;
+    @apply w-auto max-w-xs animate-expand-logo;
   }
 
   /* AI assistant */
@@ -152,6 +185,39 @@
   .ai-assistant-panel {
     @apply fixed bottom-24 right-6 w-80 md:w-96 bg-white rounded-lg shadow-xl z-40 overflow-hidden transition-all duration-300 max-h-[500px] flex flex-col;
   }
+
+  /* Form focus states */
+  .form-focus {
+    @apply focus:ring-2 focus:ring-ju4u-coral focus:border-transparent transition-all duration-200;
+  }
+
+  /* Card shadow effects */
+  .card-shadow {
+    @apply shadow-sm hover:shadow-md transition-shadow duration-300;
+  }
+
+  /* Labels */
+  .label-text {
+    @apply text-sm font-medium text-gray-700 mb-1;
+  }
+
+  /* Status badges */
+  .status-badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  .status-badge-success {
+    @apply bg-ju4u-green/10 text-ju4u-green;
+  }
+
+  .status-badge-error {
+    @apply bg-ju4u-red/10 text-ju4u-red;
+  }
+  
+  /* Image hover effects */
+  .image-zoom {
+    @apply transition-transform duration-700 hover:scale-105;
+  }
 }
 
 /* Voice search listening animation */
@@ -159,6 +225,14 @@
   animation: pulse 1.5s infinite;
 }
 
+/* Shimmer effect for loading state */
+.shimmer {
+  background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* Animations */
 @keyframes pulse {
   0% {
     transform: scale(1);
@@ -171,5 +245,26 @@
   100% {
     transform: scale(1);
     opacity: 1;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -468px 0;
+  }
+  100% {
+    background-position: 468px 0;
+  }
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+  100% {
+    transform: translateY(0);
   }
 }

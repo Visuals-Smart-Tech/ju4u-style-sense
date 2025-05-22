@@ -1,3 +1,4 @@
+
 export default {
 	darkMode: ["class"],
 	content: [
@@ -60,18 +61,21 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				// Updated JU4U colors with new accent coral
+				// JU4U colors updated according to design guidelines
 				ju4u: {
-					black: '#111111',
-					coral: '#FF4D4F',
-					white: '#FFFFFF',
-					gray: '#F7F7F7',
+					black: '#111111',  // Charcoal Black for primary text/background
+					coral: '#FF6B6B',  // Coral Red (updated to match design doc)
+					white: '#FFFFFF',  // Pure White for primary page background
+					gray: '#F7F7F7',   // Soft Gray for secondary backgrounds
+					green: '#2ECC71',  // Emerald Green for positive states
+					red: '#E63946',    // Cherry Red for error states
 				}
 			},
 			fontFamily: {
+				// Primary fonts per design guidelines
+				rubik: ['Rubik', 'sans-serif'],
 				inter: ['Inter', 'sans-serif'],
 				comfortaa: ['Comfortaa', 'sans-serif'],
-				cabin: ['Cabin', 'sans-serif'],
 				josefin: ['"Josefin Sans"', 'sans-serif'],
 			},
 			borderRadius: {
@@ -109,12 +113,26 @@ export default {
 					'100%': { transform: 'scale(1)', opacity: '1' }
 				},
 				expandLogo: {
-					'0%': { width: 'auto', opacity: '0' },
-					'100%': { width: 'auto', opacity: '1' }
+					'0%': { width: '0', maxWidth: '0', opacity: '0' },
+					'100%': { width: 'auto', maxWidth: '100%', opacity: '1' }
 				},
 				fadeInSlide: {
 					'0%': { transform: 'translateX(-10px)', opacity: '0' },
 					'100%': { transform: 'translateX(0)', opacity: '1' }
+				},
+				// New animations for microinteractions
+				pulse: {
+					'0%, 100%': { transform: 'scale(1)' },
+					'50%': { transform: 'scale(1.05)' }
+				},
+				shimmer: {
+					'0%': { backgroundPosition: '-468px 0' },
+					'100%': { backgroundPosition: '468px 0' }
+				},
+				floatUp: {
+					'0%': { transform: 'translateY(0)' },
+					'50%': { transform: 'translateY(-5px)' },
+					'100%': { transform: 'translateY(0)' }
 				}
 			},
 			animation: {
@@ -124,7 +142,11 @@ export default {
 				'slide-up': 'slideUp 0.5s ease-in-out',
 				'scale-in': 'scaleIn 0.3s ease-in-out',
 				'expand-logo': 'expandLogo 0.3s ease-in-out forwards',
-				'fade-in-slide': 'fadeInSlide 0.3s ease-in-out forwards'
+				'fade-in-slide': 'fadeInSlide 0.3s ease-in-out forwards',
+				// New animations
+				'pulse': 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+				'shimmer': 'shimmer 1.5s infinite linear',
+				'float': 'floatUp 3s ease-in-out infinite'
 			}
 		}
 	},

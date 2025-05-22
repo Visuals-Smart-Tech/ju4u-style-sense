@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { NavLink, Link } from 'react-router-dom';
 import { Search, ShoppingBag, User, Menu, X, Mic, ChevronDown } from 'lucide-react';
@@ -117,39 +118,41 @@ const Navbar = () => {
 
   return (
     <nav className="sticky top-0 z-50 bg-white shadow-sm">
-      <div className="container max-w-7xl mx-auto px-2 md:px-4">
+      <div className="container max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between h-16">
-          {/* Logo with animation */}
+          {/* Logo with improved animation */}
           <div className="flex items-center">
             <Link to="/" className="logo-container font-comfortaa text-xl font-bold tracking-wide text-ju4u-black">
               <span>JU</span>
-              <span className="logo-text-hidden animate-fade-in-slide transition-all duration-500 ease-in-out">ST</span>
+              <span className="logo-text-hidden">ST</span>
               <span className="text-ju4u-coral">4</span>
-              <span className="logo-text-hidden animate-fade-in-slide transition-all duration-700 ease-in-out">YO</span>
+              <span className="logo-text-hidden">YO</span>
               <span>U</span>
             </Link>
           </div>
 
-          {/* Desktop Navigation */}
+          {/* Desktop Navigation with improved typography */}
           <div className="hidden md:flex space-x-1 lg:space-x-2">
             {navigation.map((item) => (
               <div key={item.name} className="group relative py-4 px-2">
                 <NavLink
                   to={item.path}
                   className={({ isActive }) =>
-                    `flex items-center px-2 ${
+                    `flex items-center px-2 font-medium tracking-wide ${
                       isActive
-                        ? "text-ju4u-coral border-b-2 border-ju4u-coral font-medium"
+                        ? "text-ju4u-coral border-b-2 border-ju4u-coral"
                         : "text-ju4u-black hover:text-ju4u-coral transition-colors"
                     }`
                   }
                 >
                   {item.name}
-                  {item.dropdown && <ChevronDown className="ml-1 h-4 w-4 transition-transform group-hover:rotate-180" />}
+                  {item.dropdown && (
+                    <ChevronDown className="ml-1 h-4 w-4 transition-transform duration-300 group-hover:rotate-180" />
+                  )}
                 </NavLink>
                 
                 {item.dropdown && (
-                  <div className="nav-dropdown">
+                  <div className="nav-dropdown shadow-lg border border-gray-100">
                     {item.dropdown.map((subItem) => (
                       <Link
                         key={subItem.name}
@@ -165,13 +168,13 @@ const Navbar = () => {
             ))}
           </div>
 
-          {/* Desktop Search and Icons */}
-          <div className="hidden md:flex items-center space-x-1 lg:space-x-3">
+          {/* Desktop Search and Icons with improved interaction */}
+          <div className="hidden md:flex items-center space-x-3">
             <div ref={searchRef} className="relative">
-              <div className="flex items-center bg-gray-50 rounded-full pr-2">
+              <div className="flex items-center bg-gray-50 rounded-full pr-2 ring-1 ring-transparent focus-within:ring-ju4u-coral transition-all duration-200">
                 <input 
                   type="text" 
-                  className={`search-input bg-transparent py-1.5 pl-4 pr-8 rounded-full focus:outline-1 outline-ju4u-coral text-sm ${
+                  className={`search-input bg-transparent py-1.5 pl-4 pr-8 rounded-full outline-none text-sm ${
                     isSearchExpanded ? 'w-48 sm:w-60' : 'w-32 sm:w-40'
                   }`}
                   placeholder="Just Search"
@@ -185,20 +188,20 @@ const Navbar = () => {
                     <Mic className="h-4 w-4 text-ju4u-coral voice-listening" />
                   ) : (
                     <button onClick={handleVoiceSearch} className="mr-1">
-                      <Mic className="h-4 w-4 text-gray-500 hover:text-ju4u-coral" />
+                      <Mic className="h-4 w-4 text-gray-500 hover:text-ju4u-coral transition-colors duration-200" />
                     </button>
                   )}
                   <Search className="h-4 w-4 text-gray-500" />
                 </div>
               </div>
               
-              {/* Search Suggestions */}
+              {/* Search Suggestions with improved styling */}
               {showSuggestions && (
-                <div className="absolute top-full left-0 w-full bg-white shadow-lg rounded-md mt-1 py-1 z-50">
+                <div className="absolute top-full left-0 w-full bg-white shadow-lg rounded-md mt-1 py-1 z-50 border border-gray-100 animate-fade-in">
                   {suggestions.map((suggestion) => (
                     <button
                       key={suggestion}
-                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-ju4u-coral"
+                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-ju4u-coral transition-colors"
                       onClick={() => {
                         setSearchQuery(suggestion);
                         setShowSuggestions(false);
@@ -211,29 +214,42 @@ const Navbar = () => {
               )}
             </div>
             
+            {/* Account icon with improved hover effect */}
             <NavLink to="/account">
-              <Button variant="ghost" size="icon" aria-label="Account">
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                aria-label="Account" 
+                className="rounded-full hover:bg-gray-100 transition-colors duration-200"
+              >
                 <User className="h-5 w-5" />
               </Button>
             </NavLink>
+            
+            {/* Cart icon with badge and improved hover effect */}
             <NavLink to="/cart" className="relative">
-              <Button variant="ghost" size="icon" aria-label="Cart" className="hover:text-white">
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                aria-label="Cart" 
+                className="rounded-full hover:bg-gray-100 transition-colors duration-200"
+              >
                 <ShoppingBag className="h-5 w-5" />
               </Button>
-              <span className="absolute -top-1 -right-1 bg-ju4u-coral text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+              <span className="absolute -top-1 -right-1 bg-ju4u-coral text-white text-xs rounded-full h-5 w-5 flex items-center justify-center animate-pulse">
                 0
               </span>
             </NavLink>
           </div>
 
-          {/* Mobile Menu Button */}
+          {/* Mobile Menu Button with improved interaction */}
           <div className="md:hidden flex items-center space-x-3">
             <div className="relative" ref={searchRef}>
               {isSearchExpanded ? (
-                <div className="flex items-center bg-gray-50 rounded-full">
+                <div className="flex items-center bg-gray-50 rounded-full ring-1 ring-ju4u-coral">
                   <input 
                     type="text" 
-                    className="w-full bg-transparent py-1.5 pl-4 pr-8 rounded-full focus:outline-none text-sm"
+                    className="w-full bg-transparent py-1.5 pl-4 pr-8 rounded-full outline-none text-sm"
                     placeholder="Search products..."
                     onBlur={handleSearchBlur}
                     value={searchQuery}
@@ -244,23 +260,29 @@ const Navbar = () => {
                     <Mic className="h-4 w-4 text-ju4u-coral voice-listening mr-3" />
                   ) : (
                     <button onClick={handleVoiceSearch} className="mr-3">
-                      <Mic className="h-4 w-4 text-gray-500" />
+                      <Mic className="h-4 w-4 text-gray-500 hover:text-ju4u-coral transition-colors duration-200" />
                     </button>
                   )}
                 </div>
               ) : (
-                <Button variant="ghost" size="icon" onClick={() => setIsSearchExpanded(true)} aria-label="Search">
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  onClick={() => setIsSearchExpanded(true)} 
+                  aria-label="Search"
+                  className="rounded-full hover:bg-gray-100"
+                >
                   <Search className="h-5 w-5" />
                 </Button>
               )}
               
-              {/* Mobile Search Suggestions */}
+              {/* Mobile Search Suggestions with improved styling */}
               {showSuggestions && (
-                <div className="absolute top-full left-0 w-60 bg-white shadow-lg rounded-md mt-1 py-1 z-50">
+                <div className="absolute top-full left-0 w-60 bg-white shadow-lg rounded-md mt-1 py-1 z-50 border border-gray-100 animate-fade-in">
                   {suggestions.map((suggestion) => (
                     <button
                       key={suggestion}
-                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-ju4u-coral"
+                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-ju4u-coral transition-colors"
                       onClick={() => {
                         setSearchQuery(suggestion);
                         setShowSuggestions(false);
@@ -273,31 +295,49 @@ const Navbar = () => {
               )}
             </div>
             
+            {/* Cart icon with badge for mobile */}
             <NavLink to="/cart" className="relative">
-              <Button variant="ghost" size="icon" aria-label="Cart">
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                aria-label="Cart"
+                className="rounded-full hover:bg-gray-100"
+              >
                 <ShoppingBag className="h-5 w-5" />
               </Button>
-              <span className="absolute -top-1 -right-1 bg-ju4u-coral text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+              <span className="absolute -top-1 -right-1 bg-ju4u-coral text-white text-xs rounded-full h-5 w-5 flex items-center justify-center animate-pulse">
                 0
               </span>
             </NavLink>
-            <Button variant="ghost" size="icon" onClick={toggleMenu} aria-label="Menu">
-              {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            
+            {/* Mobile menu toggle with improved interaction */}
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={toggleMenu} 
+              aria-label="Menu"
+              className="rounded-full hover:bg-gray-100"
+            >
+              {isMenuOpen ? (
+                <X className="h-5 w-5 transition-transform duration-300 rotate-90" />
+              ) : (
+                <Menu className="h-5 w-5 transition-transform duration-300" />
+              )}
             </Button>
           </div>
         </div>
 
-        {/* Mobile Navigation */}
+        {/* Mobile Navigation with improved animation and styling */}
         {isMenuOpen && (
-          <div className="md:hidden bg-white py-4 px-2 animate-slide-up max-h-[75vh] overflow-y-auto">
+          <div className="md:hidden bg-white py-4 px-2 animate-slide-up max-h-[75vh] overflow-y-auto border-t border-gray-100">
             {navigation.map((item) => (
               <div key={item.name} className="py-2">
                 <NavLink
                   to={item.path}
                   className={({ isActive }) =>
-                    `block py-2 px-3 rounded-md ${
+                    `block py-2 px-3 rounded-md font-medium ${
                       isActive
-                        ? "text-ju4u-coral bg-gray-50 font-medium"
+                        ? "text-ju4u-coral bg-gray-50"
                         : "text-ju4u-black hover:bg-gray-50 hover:text-ju4u-coral transition-colors"
                     }`
                   }
@@ -326,7 +366,7 @@ const Navbar = () => {
               </div>
             ))}
 
-            <div className="mt-4 border-t pt-4">
+            <div className="mt-4 border-t border-gray-100 pt-4">
               <NavLink 
                 to="/account" 
                 className="flex items-center py-2 px-3 text-gray-700 hover:bg-gray-50 hover:text-ju4u-coral rounded-md"

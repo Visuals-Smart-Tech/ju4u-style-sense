@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Bot, X, Send, ThumbsUp, ThumbsDown, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -84,34 +85,34 @@ const AIAssistant = () => {
 
   return (
     <>
-      {/* Floating bubble */}
+      {/* Floating bubble with improved animation */}
       <button 
-        className="ai-assistant-bubble"
+        className="ai-assistant-bubble animate-float"
         onClick={() => setIsOpen(true)}
         aria-label="Open AI Fashion Assistant"
       >
         <Bot className="h-6 w-6" />
       </button>
       
-      {/* Chat panel */}
+      {/* Chat panel with improved design */}
       {isOpen && (
-        <div className="ai-assistant-panel">
-          {/* Header */}
-          <div className="p-3 bg-ju4u-coral text-white flex items-center justify-between">
+        <div className="ai-assistant-panel animate-scale-in shadow-2xl">
+          {/* Header with improved styling */}
+          <div className="p-4 bg-ju4u-coral text-white flex items-center justify-between">
             <div className="flex items-center">
               <Sparkles className="h-5 w-5 mr-2" />
               <h3 className="font-medium">Style Assistant</h3>
             </div>
             <button 
               onClick={() => setIsOpen(false)}
-              className="p-1 hover:bg-white/10 rounded-full transition-colors"
+              className="p-1.5 hover:bg-white/10 rounded-full transition-colors"
               aria-label="Close assistant"
             >
-              <X className="h-5 w-5" />
+              <X className="h-4 w-4" />
             </button>
           </div>
           
-          {/* Messages */}
+          {/* Messages with improved styling */}
           <div className="flex-1 p-4 overflow-y-auto" style={{ maxHeight: '350px' }}>
             {messages.map((message, index) => (
               <div 
@@ -121,18 +122,18 @@ const AIAssistant = () => {
                 <div 
                   className={`${
                     message.sender === 'user' 
-                      ? 'bg-ju4u-coral text-white rounded-tl-lg rounded-tr-lg rounded-bl-lg' 
-                      : 'bg-gray-100 text-gray-800 rounded-tl-lg rounded-tr-lg rounded-br-lg'
-                  } p-3 max-w-[85%]`}
+                      ? 'bg-ju4u-coral text-white rounded-tl-lg rounded-tr-lg rounded-bl-lg shadow-sm' 
+                      : 'bg-gray-100 text-gray-800 rounded-tl-lg rounded-tr-lg rounded-br-lg shadow-sm'
+                  } p-3 max-w-[85%] animate-fade-in`}
                 >
                   <p className="text-sm">{message.text}</p>
                   <div className="mt-1 flex items-center justify-end">
                     {message.sender === 'bot' && (
                       <div className="flex gap-1">
-                        <button className="p-1 hover:bg-white/20 rounded-full" aria-label="Thumbs up">
+                        <button className="p-1 hover:bg-white/20 rounded-full transition-colors" aria-label="Thumbs up">
                           <ThumbsUp className="h-3 w-3" />
                         </button>
-                        <button className="p-1 hover:bg-white/20 rounded-full" aria-label="Thumbs down">
+                        <button className="p-1 hover:bg-white/20 rounded-full transition-colors" aria-label="Thumbs down">
                           <ThumbsDown className="h-3 w-3" />
                         </button>
                       </div>
@@ -146,8 +147,8 @@ const AIAssistant = () => {
             ))}
           </div>
           
-          {/* Suggestions */}
-          <div className="px-4 py-2 border-t border-gray-100 flex gap-2 overflow-x-auto">
+          {/* Suggestions with improved styling */}
+          <div className="px-4 py-3 border-t border-gray-100 flex gap-2 overflow-x-auto">
             {outfitSuggestions.map((suggestion, index) => (
               <button 
                 key={index}
@@ -159,7 +160,7 @@ const AIAssistant = () => {
             ))}
           </div>
           
-          {/* Input */}
+          {/* Input with improved styling */}
           <div className="p-3 border-t border-gray-200 flex gap-2">
             <input
               type="text"
@@ -167,12 +168,12 @@ const AIAssistant = () => {
               onChange={(e) => setInput(e.target.value)}
               onKeyPress={handleKeyPress}
               placeholder="Ask about styles, outfits, or sizes..."
-              className="flex-1 py-2 px-3 border border-gray-300 rounded-md focus:outline-none focus:border-ju4u-coral text-sm"
+              className="flex-1 py-2 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-ju4u-coral focus:border-transparent transition-all duration-200 text-sm"
             />
             <Button 
               onClick={handleSendMessage}
               disabled={!input.trim()}
-              className="bg-ju4u-coral hover:bg-ju4u-coral/90"
+              className="bg-ju4u-coral hover:bg-ju4u-coral/90 transition-colors"
               aria-label="Send message"
             >
               <Send className="h-4 w-4" />
