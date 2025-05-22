@@ -123,10 +123,10 @@ const Navbar = () => {
           <div className="flex items-center">
             <Link to="/" className="logo-container font-comfortaa text-xl font-bold tracking-wide text-ju4u-black">
               <span>JU</span>
-              <span className="logo-text-hidden animate-fade-in-slide">ST</span>
+              <span className="logo-text-hidden animate-fade-in-slide transition-all duration-500 ease-in-out">ST</span>
               <span className="text-ju4u-coral">4</span>
+              <span className="logo-text-hidden animate-fade-in-slide transition-all duration-700 ease-in-out">YO</span>
               <span>U</span>
-              <span className="logo-text-hidden animate-fade-in-slide">OU</span>
             </Link>
           </div>
 
@@ -171,16 +171,16 @@ const Navbar = () => {
               <div className="flex items-center bg-gray-50 rounded-full pr-2">
                 <input 
                   type="text" 
-                  className={`search-input bg-transparent py-1.5 pl-4 pr-8 rounded-full focus:outline-none text-sm ${
+                  className={`search-input bg-transparent py-1.5 pl-4 pr-8 rounded-full focus:outline-1 outline-ju4u-coral text-sm ${
                     isSearchExpanded ? 'w-48 sm:w-60' : 'w-32 sm:w-40'
                   }`}
-                  placeholder="Search products..."
+                  placeholder="Just Search"
                   onFocus={handleSearchFocus}
                   onBlur={handleSearchBlur}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
-                <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center">
+                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center">
                   {isVoiceListening ? (
                     <Mic className="h-4 w-4 text-ju4u-coral voice-listening" />
                   ) : (
@@ -212,12 +212,12 @@ const Navbar = () => {
             </div>
             
             <NavLink to="/account">
-              <Button variant="ghost" size="icon" aria-label="Account" className="hover:text-ju4u-coral">
+              <Button variant="ghost" size="icon" aria-label="Account">
                 <User className="h-5 w-5" />
               </Button>
             </NavLink>
             <NavLink to="/cart" className="relative">
-              <Button variant="ghost" size="icon" aria-label="Cart" className="hover:text-ju4u-coral">
+              <Button variant="ghost" size="icon" aria-label="Cart" className="hover:text-white">
                 <ShoppingBag className="h-5 w-5" />
               </Button>
               <span className="absolute -top-1 -right-1 bg-ju4u-coral text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
