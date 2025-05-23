@@ -24,44 +24,50 @@ export const getProducts = async ({
   category = null,
   priceMin = null,
   priceMax = null,
+  searchQuery = null,
   sortBy = 'createdAt',
   sortDirection = 'desc',
   pageSize = 12,
   lastDoc = null
 }) => {
   try {
-    // Start building query
-    let q = productsRef;
+    // Start building query constraints
+    const constraints = [];
     
     // Apply filters if provided
-    const filters = [];
+    if (category && category !== 'all' && category !== 'new' && category !== 'sale') {
+      constraints.push(where('category', '==', category));
+    }
     
-    if (category) {
-      filters.push(where('category', '==', category));
+    if (category === 'new') {
+      constraints.push(where('new', '==', true));
+    }
+    
+    if (category === 'sale') {
+      constraints.push(where('discount', '>', 0));
     }
     
     if (priceMin !== null) {
-      filters.push(where('price', '>=', priceMin));
+      constraints.push(where('price', '>=', priceMin));
     }
     
     if (priceMax !== null) {
-      filters.push(where('price', '<=', priceMax));
+      constraints.push(where('price', '<=', priceMax));
     }
     
-    // Apply all filters and sorting
-    q = query(
-      productsRef,
-      ...filters,
-      orderBy(sortBy, sortDirection),
-      limit(pageSize)
-    );
+    // Apply sorting
+    constraints.push(orderBy(sortBy, sortDirection));
+    
+    // Limit the number of results
+    constraints.push(limit(pageSize));
     
     // Apply pagination if lastDoc provided
     if (lastDoc) {
-      q = query(q, startAfter(lastDoc));
+      constraints.push(startAfter(lastDoc));
     }
     
     // Execute query
+    const q = query(productsRef, ...constraints);
     const snapshot = await getDocs(q);
     
     // Get the last document for pagination
@@ -72,6 +78,21 @@ export const getProducts = async ({
       id: doc.id,
       ...doc.data()
     }));
+
+    // Apply client-side search if provided (for small datasets)
+    // For production, consider using a dedicated search service
+    if (searchQuery && searchQuery.trim() !== '') {
+      const search = searchQuery.toLowerCase().trim();
+      return {
+        products: products.filter(product => 
+          product.name.toLowerCase().includes(search) || 
+          product.description.toLowerCase().includes(search) ||
+          product.brand.toLowerCase().includes(search)
+        ),
+        lastVisible,
+        hasMore: snapshot.docs.length === pageSize
+      };
+    }
     
     return {
       products,
