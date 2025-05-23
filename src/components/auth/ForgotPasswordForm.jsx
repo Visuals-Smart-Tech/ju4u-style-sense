@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import { FiMail, FiAlertCircle, FiArrowLeft } from 'lucide-react';
+import { Mail, AlertCircle, ArrowLeft } from 'lucide-react';
 
 export default function ForgotPasswordForm() {
   const [email, setEmail] = useState('');
@@ -45,7 +45,7 @@ export default function ForgotPasswordForm() {
       
       {error && (
         <div className="bg-destructive/10 text-destructive rounded-md p-3 flex items-center gap-2 text-sm">
-          <FiAlertCircle />
+          <AlertCircle />
           <span>{error}</span>
         </div>
       )}
@@ -60,7 +60,7 @@ export default function ForgotPasswordForm() {
         <div className="space-y-2">
           <Label htmlFor="email">Email</Label>
           <div className="relative">
-            <FiMail className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
             <Input
               id="email"
               type="email"
@@ -90,7 +90,7 @@ export default function ForgotPasswordForm() {
           className="flex items-center gap-2 mx-auto"
           onClick={() => navigate('/login')}
         >
-          <FiArrowLeft size={16} />
+          <ArrowLeft size={16} />
           <span>Back to Login</span>
         </Button>
       </div>
