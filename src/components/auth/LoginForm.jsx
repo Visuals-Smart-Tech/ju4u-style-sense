@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from 'sonner';
-import { FiMail, FiLock, FiAlertCircle } from 'lucide-react';
+import { Mail, Lock, AlertCircle } from 'lucide-react';
 
 export default function LoginForm() {
   const [email, setEmail] = useState('');
@@ -65,7 +65,7 @@ export default function LoginForm() {
       
       {error && (
         <div className="bg-destructive/10 text-destructive rounded-md p-3 flex items-center gap-2 text-sm">
-          <FiAlertCircle />
+          <AlertCircle />
           <span>{error}</span>
         </div>
       )}
@@ -74,7 +74,7 @@ export default function LoginForm() {
         <div className="space-y-2">
           <Label htmlFor="email">Email</Label>
           <div className="relative">
-            <FiMail className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
             <Input
               id="email"
               type="email"
@@ -99,7 +99,7 @@ export default function LoginForm() {
             </button>
           </div>
           <div className="relative">
-            <FiLock className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
             <Input
               id="password"
               type="password"
