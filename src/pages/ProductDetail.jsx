@@ -18,9 +18,9 @@ export const allProducts = [
     name: 'Oversized Cotton Shirt',
     price: 89.99,
     images: [
-      'https://shorturl.at/MsK6o',
-      'https://shorturl.at/MsK6o',
-      'https://shorturl.at/MsK6o',
+      'https://images.unsplash.com/photo-1512436991641-6745cdb1723f?q=80&w=800',
+      'https://images.unsplash.com/photo-1512436991641-6745cdb1723f?q=80&w=800',
+      'https://images.unsplash.com/photo-1512436991641-6745cdb1723f?q=80&w=800',
     ],
     category: 'women',
     description: 'A relaxed fit oversized cotton shirt perfect for everyday wear. Made from premium 100% organic cotton for ultimate comfort and breathability. Features a classic collar, button-down front, and long sleeves with button cuffs. The oversized silhouette provides a fashionable, laid-back look that pairs perfectly with jeans, leggings, or tucked into skirts.',
@@ -70,9 +70,9 @@ export const allProducts = [
     name: 'High-Waisted Trousers',
     price: 119.99,
     images: [
-      'https://shorturl.at/bsQ84',
-      'https://shorturl.at/bsQ84',
-      'https://shorturl.at/bsQ84'
+      'https://i.pinimg.com/originals/b2/8a/b6/b28ab664841c6dcf7005dc50849788cb.jpg',
+      'https://i.pinimg.com/originals/b2/8a/b6/b28ab664841c6dcf7005dc50849788cb.jpg',
+      'https://i.pinimg.com/originals/b2/8a/b6/b28ab664841c6dcf7005dc50849788cb.jpg',
     ],
     category: 'women',
     description: 'Elegant high-waisted trousers for a sophisticated look. These tailored trousers feature a flattering high waist, side pockets, and a relaxed straight leg. Made from a premium blend with a hint of stretch for comfort and movement. Perfect for office wear or dressed up for special occasions.',

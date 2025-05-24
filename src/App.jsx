@@ -22,6 +22,7 @@ import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import AIAssistant from "./components/AIAssistant";
 import AdminDashboard from "./pages/AdminDashboard";
+import NewArrivals from "./pages/NewArrivals";
 
 const queryClient = new QueryClient();
 
@@ -49,6 +50,7 @@ const App = () => (
                 <Route path="/signup" element={<Signup />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/admin" element={<AdminDashboard />} />
+                <Route path="/new-arrivals" element={<NewArrivals />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
