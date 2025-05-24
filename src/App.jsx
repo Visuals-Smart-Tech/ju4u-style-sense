@@ -23,6 +23,19 @@ import Footer from "./components/Footer";
 import AIAssistant from "./components/AIAssistant";
 import AdminDashboard from "./pages/AdminDashboard";
 import NewArrivals from "./pages/NewArrivals";
+import Inspiration from "./pages/Inspiration";
+import Trends from "./pages/Trends";
+import Quiz from "./pages/Quiz";
+import Bestsellers from "./pages/Bestsellers";
+import Essentials from "./pages/Essentials";
+import Careers from "./pages/Careers";
+import FAQ from "./pages/FAQ";
+import Shipping from "./pages/Shipping";
+import Returns from "./pages/Returns";
+import Privacy from "./pages/Privacy";
+import Contact from "./pages/Contact";
+import Terms from "./pages/Terms";
+import Cookies from "./pages/Cookies";
 
 const queryClient = new QueryClient();
 
@@ -51,6 +64,19 @@ const App = () => (
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/admin" element={<AdminDashboard />} />
                 <Route path="/new-arrivals" element={<NewArrivals />} />
+                <Route path="/inspiration" element={<Inspiration />} />
+                <Route path="/trends" element={<Trends />} />
+                <Route path="/quiz" element={<Quiz />} />
+                <Route path="/bestsellers" element={<Bestsellers />} />
+                <Route path="/essentials" element={<Essentials />} />
+                <Route path="/careers" element={<Careers />} />
+                <Route path="/faq" element={<FAQ />} />
+                <Route path="/shipping" element={<Shipping />} />
+                <Route path="/returns" element={<Returns />} />
+                <Route path="/privacy" element={<Privacy />} />
+                <Route path="/contact" element={<Contact />} />
+                <Route path="/terms" element={<Terms />} />
+                <Route path="/cookies" element={<Cookies />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>

@@ -9,7 +9,8 @@ import {
   Calendar, 
   CreditCardIcon, 
   UserCheck, 
-  ShoppingBag 
+  ShoppingBag,
+  Truck
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/components/ui/sonner';
@@ -167,16 +168,18 @@ const Checkout = () => {
     return (
       <div className="flex justify-center mb-8">
         {steps.map((step, index) => (
-          <React.Fragment key={step.id}>
+          <div key={step.id} className="flex items-center">
             <div className="flex flex-col items-center">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                currentStep === step.id 
-                  ? 'bg-ju4u-coral text-white' 
-                  : steps.findIndex(s => s.id === currentStep) > index
+              <div
+                className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                  currentStep === step.id
+                    ? 'bg-ju4u-coral text-white'
+                    : steps.findIndex((s) => s.id === currentStep) > index
                     ? 'bg-green-500 text-white'
                     : 'bg-gray-200 text-gray-500'
-              }`}>
-                {steps.findIndex(s => s.id === currentStep) > index ? (
+                }`}
+              >
+                {steps.findIndex((s) => s.id === currentStep) > index ? (
                   <CheckCircle className="h-5 w-5" />
                 ) : (
                   index + 1
@@ -184,24 +187,27 @@ const Checkout = () => {
               </div>
               <span className="text-xs mt-1">{step.label}</span>
             </div>
-            
+
             {index < steps.length - 1 && (
               <div className="w-16 h-1 bg-gray-200 self-center mx-2">
-                <div className={`h-full ${
-                  steps.findIndex(s => s.id === currentStep) > index
-                    ? 'bg-green-500'
-                    : 'bg-gray-200'
-                }`} 
-                style={{ 
-                  width: currentStep === step.id 
-                    ? '50%' 
-                    : steps.findIndex(s => s.id === currentStep) > index
-                      ? '100%'
-                      : '0%' 
-                }}></div>
+                <div
+                  className={`h-full ${
+                    steps.findIndex((s) => s.id === currentStep) > index
+                      ? 'bg-green-500'
+                      : 'bg-gray-200'
+                  }`}
+                  style={{
+                    width:
+                      currentStep === step.id
+                        ? '50%'
+                        : steps.findIndex((s) => s.id === currentStep) > index
+                        ? '100%'
+                        : '0%'
+                  }}
+                ></div>
               </div>
             )}
-          </React.Fragment>
+          </div>
         ))}
       </div>
     );

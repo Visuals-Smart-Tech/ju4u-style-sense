@@ -37,11 +37,24 @@ const addToRemoveQueue = (toastId) => {
 
 export const reducer = (state, action) => {
   switch (action.type) {
-    case "ADD_TOAST":
+    case "ADD_TOAST": {
+      // Validate toast object
+      const validToast = {
+        id: action.toast.id,
+        title: action.toast.title,
+        description: action.toast.description,
+        action: action.toast.action,
+        className: action.toast.className,
+        style: action.toast.style,
+        onClick: action.toast.onClick,
+        onClose: action.toast.onClose,
+      }
+
       return {
         ...state,
-        toasts: [action.toast, ...state.toasts].slice(0, TOAST_LIMIT),
+        toasts: [validToast, ...state.toasts].slice(0, TOAST_LIMIT),
       }
+    }
 
     case "UPDATE_TOAST":
       return {
