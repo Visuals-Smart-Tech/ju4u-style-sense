@@ -1,8 +1,8 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { NavLink, Link } from 'react-router-dom';
 import { Search, ShoppingBag, User, Menu, X, Mic, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useCart } from '@/contexts/CartContext';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -10,7 +10,9 @@ const Navbar = () => {
   const [isVoiceListening, setIsVoiceListening] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [openDropdown, setOpenDropdown] = useState(null);
   const searchRef = useRef(null);
+  const { cart } = useCart();
   
   // Sample search suggestions
   const suggestions = [
@@ -27,14 +29,32 @@ const Navbar = () => {
   };
 
   const handleVoiceSearch = () => {
+    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+      alert('Sorry, your browser does not support voice search.');
+      return;
+    }
     setIsVoiceListening(true);
-    
-    // Simulate voice recognition with a timeout
-    setTimeout(() => {
-      setSearchQuery('Red dresses in size M');
+    setShowSuggestions(false);
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'en-US';
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      setSearchQuery(transcript);
       setIsVoiceListening(false);
       setShowSuggestions(true);
-    }, 2000);
+    };
+    recognition.onerror = (event) => {
+      setIsVoiceListening(false);
+      alert('Voice search error: ' + event.error);
+    };
+    recognition.onend = () => {
+      setIsVoiceListening(false);
+    };
+    recognition.start();
   };
 
   const handleSearchFocus = () => {
@@ -67,54 +87,57 @@ const Navbar = () => {
   // Navigation structure with dropdowns
   const navigation = [
     {
-      name: 'Women',
+      name: 'WOMEN',
       path: '/catalog/women',
       dropdown: [
         { name: 'Tops', path: '/catalog/women?category=tops' },
-        { name: 'Bottoms', path: '/catalog/women?category=bottoms' },
+        { name: 'Tshirts', path: '/catalog/women?category=tshirts' },
         { name: 'Dresses', path: '/catalog/women?category=dresses' },
-        { name: 'Outerwear', path: '/catalog/women?category=outerwear' },
-        { name: 'Activewear', path: '/catalog/women?category=activewear' },
+        { name: 'Jeans', path: '/catalog/women?category=jeans' },
+        { name: 'Skirts', path: '/catalog/women?category=skirts' },
+        {}
       ]
     },
     {
-      name: 'Men',
+      name: 'MEN',
       path: '/catalog/men',
       dropdown: [
         { name: 'Shirts', path: '/catalog/men?category=shirts' },
         { name: 'Pants', path: '/catalog/men?category=pants' },
         { name: 'Suits', path: '/catalog/men?category=suits' },
-        { name: 'Outerwear', path: '/catalog/men?category=outerwear' },
-        { name: 'Activewear', path: '/catalog/men?category=activewear' },
+        { name: 'Trousers', path: '/catalog/men?category=trousers' },
+        { name: 'Jackets', path: '/catalog/men?category=jackets' },
       ]
     },
     {
-      name: 'Accessories',
+      name: 'ACCESSORIES',
       path: '/catalog/accessories',
       dropdown: [
-        { name: 'Bags', path: '/catalog/bags' },
-        { name: 'Jewelry', path: '/catalog/jewelry' },
+        { name: 'Bags', path: '/catalog/accessories?category=bags' },
+        { name: 'Jewelry', path: '/catalog/accessories?category=jewelry' },
         { name: 'Belts', path: '/catalog/accessories?category=belts' },
         { name: 'Hats & Scarves', path: '/catalog/accessories?category=hats' },
         { name: 'Sunglasses', path: '/catalog/accessories?category=sunglasses' },
       ]
     },
     {
-      name: 'Shoes',
-      path: '/catalog/shoes',
+      name: 'FOOTWEAR',
+      path: '/catalog/footwears',
       dropdown: [
-        { name: 'Women\'s Shoes', path: '/catalog/shoes?gender=women' },
-        { name: 'Men\'s Shoes', path: '/catalog/shoes?gender=men' },
-        { name: 'Sneakers', path: '/catalog/shoes?type=sneakers' },
-        { name: 'Boots', path: '/catalog/shoes?type=boots' },
-        { name: 'Sandals', path: '/catalog/shoes?type=sandals' },
+        { name: 'Sneakers', path: '/catalog/footwears?gender=women' },
+        { name: 'Sandals', path: '/catalog/footwears?gender=men' },
+        { name: 'Loafers', path: '/catalog/footwears?type=loafers' },
+        { name: 'Boots', path: '/catalog/footwears?type=boots' },
+        { name: 'Flip Flops', path: '/catalog/footwears?type=flip-flops' },
       ]
     },
     {
-      name: 'Sale',
+      name: 'SALE',
       path: '/catalog/sale',
     },
   ];
+
+  const cartCount = cart && cart.items ? cart.items.reduce((sum, item) => sum + (item.quantity || 1), 0) : 0;
 
   return (
     <nav className="sticky top-0 z-50 bg-white shadow-sm">
@@ -122,11 +145,19 @@ const Navbar = () => {
         <div className="flex items-center justify-between h-16">
           {/* Logo with improved animation */}
           <div className="flex items-center">
-            <Link to="/" className="logo-container font-comfortaa text-xl font-bold tracking-wide text-ju4u-black">
+            <Link to="/" className="logo-container font-comfortaa text-xl font-bold tracking-wide text-ju4u-black group relative">
               <span>JU</span>
-              <span className="logo-text-hidden">ST</span>
+              <span
+                className="logo-text-hidden transition-all duration-500 ease-in-out group-hover:mx-1 group-hover:opacity-100 group-hover:scale-100 mx-0 opacity-0 scale-75"
+              >
+                ST
+              </span>
               <span className="text-ju4u-coral">4</span>
-              <span className="logo-text-hidden">YO</span>
+              <span
+                className="logo-text-hidden transition-all duration-700 ease-in-out group-hover:mx-1 group-hover:opacity-100 group-hover:scale-100 mx-0 opacity-0 scale-75"
+              >
+                YO
+              </span>
               <span>U</span>
             </Link>
           </div>
@@ -146,16 +177,14 @@ const Navbar = () => {
                   }
                 >
                   {item.name}
-                  {item.dropdown && (
-                    <ChevronDown className="ml-1 h-4 w-4 transition-transform duration-300 group-hover:rotate-180" />
-                  )}
+                
                 </NavLink>
                 
                 {item.dropdown && (
                   <div className="nav-dropdown shadow-lg border border-gray-100">
-                    {item.dropdown.map((subItem) => (
+                    {item.dropdown.map((subItem, idx) => (
                       <Link
-                        key={subItem.name}
+                        key={subItem.name ? subItem.name + idx : idx}
                         to={subItem.path}
                         className="nav-dropdown-item"
                       >
@@ -237,32 +266,70 @@ const Navbar = () => {
                 <ShoppingBag className="h-5 w-5" />
               </Button>
               <span className="absolute -top-1 -right-1 bg-ju4u-coral text-white text-xs rounded-full h-5 w-5 flex items-center justify-center animate-pulse">
-                0
+                {cartCount}
               </span>
             </NavLink>
           </div>
 
           {/* Mobile Menu Button with improved interaction */}
           <div className="md:hidden flex items-center space-x-3">
-            <div className="relative" ref={searchRef}>
+            <div className="relative flex-1" ref={searchRef}>
               {isSearchExpanded ? (
-                <div className="flex items-center bg-gray-50 rounded-full ring-1 ring-ju4u-coral">
-                  <input 
-                    type="text" 
-                    className="w-full bg-transparent py-1.5 pl-4 pr-8 rounded-full outline-none text-sm"
-                    placeholder="Search products..."
-                    onBlur={handleSearchBlur}
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    autoFocus
-                  />
-                  {isVoiceListening ? (
-                    <Mic className="h-4 w-4 text-ju4u-coral voice-listening mr-3" />
-                  ) : (
-                    <button onClick={handleVoiceSearch} className="mr-3">
-                      <Mic className="h-4 w-4 text-gray-500 hover:text-ju4u-coral transition-colors duration-200" />
-                    </button>
+                <div className="fixed inset-0 z-50 bg-white bg-opacity-95 flex flex-col items-center px-4 pt-4 transition-all duration-300">
+                  <div className="w-full flex items-center bg-gray-50 rounded-full ring-1 ring-ju4u-coral shadow-lg relative">
+                    <input 
+                      type="text" 
+                      className="w-full bg-transparent py-2 pl-4 pr-10 rounded-full outline-none text-base"
+                      placeholder="Search products..."
+                      onFocus={handleSearchFocus}
+                      onBlur={handleSearchBlur}
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      autoFocus
+                      style={{ minWidth: 0 }}
+                    />
+                    {isVoiceListening ? (
+                      <Mic className="h-5 w-5 text-ju4u-coral voice-listening mr-3" />
+                    ) : (
+                      <button
+                        type="button"
+                        onMouseDown={e => e.preventDefault()}
+                        onClick={handleVoiceSearch}
+                        className="mr-3"
+                      >
+                        <Mic className="h-5 w-5 text-gray-500 hover:text-ju4u-coral transition-colors duration-200" />
+                      </button>
+                    )}
+                  </div>
+                  {/* Mobile Search Suggestions with improved styling */}
+                  {showSuggestions && (
+                    <div className="w-full bg-white shadow-lg rounded-md mt-1 py-1 z-50 border border-gray-100 animate-fade-in">
+                      {suggestions.map((suggestion) => (
+                        <button
+                          key={suggestion}
+                          className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-ju4u-coral transition-colors"
+                          onClick={() => {
+                            setSearchQuery(suggestion);
+                            setShowSuggestions(false);
+                          }}
+                        >
+                          {suggestion}
+                        </button>
+                      ))}
+                    </div>
                   )}
+                  <button
+                    onClick={() => {
+                      setIsSearchExpanded(false);
+                      setShowSuggestions(false);
+                    }}
+                    className="mt-4 bg-white shadow rounded-full flex items-center justify-center text-gray-400 hover:text-ju4u-coral hover:bg-gray-100 transition-colors duration-200"
+                    aria-label="Close search"
+                    tabIndex={-1}
+                    style={{ minWidth: 48, minHeight: 48 }}
+                  >
+                    <X className="h-5 w-5" />
+                  </button>
                 </div>
               ) : (
                 <Button 
@@ -274,24 +341,6 @@ const Navbar = () => {
                 >
                   <Search className="h-5 w-5" />
                 </Button>
-              )}
-              
-              {/* Mobile Search Suggestions with improved styling */}
-              {showSuggestions && (
-                <div className="absolute top-full left-0 w-60 bg-white shadow-lg rounded-md mt-1 py-1 z-50 border border-gray-100 animate-fade-in">
-                  {suggestions.map((suggestion) => (
-                    <button
-                      key={suggestion}
-                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-ju4u-coral transition-colors"
-                      onClick={() => {
-                        setSearchQuery(suggestion);
-                        setShowSuggestions(false);
-                      }}
-                    >
-                      {suggestion}
-                    </button>
-                  ))}
-                </div>
               )}
             </div>
             
@@ -306,7 +355,7 @@ const Navbar = () => {
                 <ShoppingBag className="h-5 w-5" />
               </Button>
               <span className="absolute -top-1 -right-1 bg-ju4u-coral text-white text-xs rounded-full h-5 w-5 flex items-center justify-center animate-pulse">
-                0
+                {cartCount}
               </span>
             </NavLink>
             
@@ -330,42 +379,56 @@ const Navbar = () => {
         {/* Mobile Navigation with improved animation and styling */}
         {isMenuOpen && (
           <div className="md:hidden bg-white py-4 px-2 animate-slide-up max-h-[75vh] overflow-y-auto border-t border-gray-100">
-            {navigation.map((item) => (
-              <div key={item.name} className="py-2">
-                <NavLink
-                  to={item.path}
-                  className={({ isActive }) =>
-                    `block py-2 px-3 rounded-md font-medium ${
-                      isActive
-                        ? "text-ju4u-coral bg-gray-50"
-                        : "text-ju4u-black hover:bg-gray-50 hover:text-ju4u-coral transition-colors"
-                    }`
-                  }
-                  onClick={item.dropdown ? undefined : () => setIsMenuOpen(false)}
-                >
-                  <span className="flex items-center justify-between">
-                    {item.name}
-                    {item.dropdown && <ChevronDown className="h-4 w-4" />}
-                  </span>
-                </NavLink>
-                
-                {item.dropdown && (
-                  <div className="pl-4 my-1">
-                    {item.dropdown.map((subItem) => (
-                      <Link
-                        key={subItem.name}
-                        to={subItem.path}
-                        className="block py-2 px-3 text-sm text-gray-600 hover:bg-gray-50 hover:text-ju4u-coral rounded-md"
-                        onClick={() => setIsMenuOpen(false)}
+            {navigation.map((item, idx) => {
+              const hasDropdown = !!item.dropdown;
+              const isOpen = openDropdown === idx;
+              return (
+                <div key={item.name} className="py-2">
+                  <div className="flex items-center justify-between">
+                    <NavLink
+                      to={item.path}
+                      className={({ isActive }) =>
+                        `block py-2 px-3 rounded-md font-medium flex-1 text-left ${
+                          isActive
+                            ? "text-ju4u-coral bg-gray-50"
+                            : "text-ju4u-black hover:bg-gray-50 hover:text-ju4u-coral transition-colors"
+                        }`
+                      }
+                      onClick={hasDropdown ? (e) => e.preventDefault() : () => setIsMenuOpen(false)}
+                    >
+                      {item.name}
+                    </NavLink>
+                    {hasDropdown && (
+                      <button
+                        className={`ml-2 p-2 rounded-full hover:bg-gray-100 transition-colors ${isOpen ? 'bg-gray-100' : ''}`}
+                        onClick={() => setOpenDropdown(isOpen ? null : idx)}
+                        aria-label={isOpen ? `Close ${item.name} menu` : `Open ${item.name} menu`}
+                        tabIndex={0}
+                        type="button"
                       >
-                        {subItem.name}
-                      </Link>
-                    ))}
+                        <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+                      </button>
+                    )}
                   </div>
-                )}
-              </div>
-            ))}
-
+                  {hasDropdown && isOpen && (
+                    <div className="pl-4 my-1">
+                      {item.dropdown.map((subItem, subIdx) => (
+                        subItem.name ? (
+                          <Link
+                            key={subItem.name + subIdx}
+                            to={subItem.path}
+                            className="block py-2 px-3 text-sm text-gray-600 hover:bg-gray-50 hover:text-ju4u-coral rounded-md"
+                            onClick={() => setIsMenuOpen(false)}
+                          >
+                            {subItem.name}
+                          </Link>
+                        ) : null
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
             <div className="mt-4 border-t border-gray-100 pt-4">
               <NavLink 
                 to="/account" 

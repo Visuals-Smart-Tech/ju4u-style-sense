@@ -12,8 +12,8 @@ const allProducts = [
 		name: 'Oversized Cotton Shirt',
 		price: 89.99,
 		images: [
-			'https://images.unsplash.com/photo-1604176424472-9e9468137614?q=80&w=1974',
-			'https://images.unsplash.com/photo-1604176424472-9e9468137614?q=80&w=1974',
+			'https://shorturl.at/MsK6o',
+            'https://shorturl.at/MsK6o',
 		],
 		category: 'women',
 		description: 'A relaxed fit oversized cotton shirt perfect for everyday wear.',
@@ -61,8 +61,8 @@ const allProducts = [
 		name: 'High-Waisted Trousers',
 		price: 119.99,
 		images: [
-			'https://images.unsplash.com/photo-1548624313-0396965c11f3?q=80&w=2070',
-			'https://images.unsplash.com/photo-1548624313-0396965c11f3?q=80&w=2070',
+			'https://shorturl.at/bsQ84',
+            'https://shorturl.at/bsQ84',
 		],
 		category: 'women',
 		description: 'Elegant high-waisted trousers for a sophisticated look.',

@@ -1,4 +1,3 @@
-
 import { 
   collection, 
   doc, 
@@ -107,59 +106,23 @@ export const getProducts = async ({
 
 // Get a single product by ID
 export const getProductById = async (productId) => {
-  try {
-    const productRef = doc(productsRef, productId);
-    const productSnap = await getDoc(productRef);
-    
-    if (!productSnap.exists()) {
-      throw new Error('Product not found');
-    }
-    
-    return {
-      id: productSnap.id,
-      ...productSnap.data()
-    };
-  } catch (error) {
-    console.error('Error fetching product:', error);
-    throw error;
-  }
+  const ref = doc(productsRef, productId);
+  const snap = await getDoc(ref);
+  return snap.exists() ? { id: snap.id, ...snap.data() } : null;
 };
 
-// Get featured products
-export const getFeaturedProducts = async (count = 4) => {
-  try {
-    // Modified query to avoid requiring a composite index
-    // First get products
-    const q = query(
-      productsRef,
-      where('featured', '==', true),
-      limit(count)
-    );
-    
-    const snapshot = await getDocs(q);
-    
-    // Then sort them client-side
-    const products = snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    }));
-    
-    // Sort by createdAt in descending order
-    return products.sort((a, b) => {
-      // Handle potential undefined createdAt values
-      if (!a.createdAt) return 1;
-      if (!b.createdAt) return -1;
-      
-      // Convert Firebase timestamps to milliseconds for comparison
-      const timeA = a.createdAt.seconds ? a.createdAt.seconds * 1000 : 0;
-      const timeB = b.createdAt.seconds ? b.createdAt.seconds * 1000 : 0;
-      
-      return timeB - timeA; // descending order
-    });
-  } catch (error) {
-    console.error('Error fetching featured products:', error);
-    throw error;
-  }
+// Get featured products (where featured == true, limit 8)
+export const getFeaturedProducts = async () => {
+  const q = query(productsRef, where('featured', '==', true), limit(8));
+  const snap = await getDocs(q);
+  return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+};
+
+// Get all categories
+export const getCategories = async () => {
+  const categoriesRef = collection(db, 'categories');
+  const snap = await getDocs(categoriesRef);
+  return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 };
 
 // Admin only: Create a new product

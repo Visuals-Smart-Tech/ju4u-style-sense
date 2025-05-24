@@ -6,17 +6,21 @@ import ProductCard from '@/components/ProductCard';
 import FitAssistant from '@/components/FitAssistant';
 import VirtualTryOn from '@/components/VirtualTryOn';
 import { toast } from '@/components/ui/sonner';
+import { useToast } from '@/components/ui/use-toast';
+import { getProductById } from '@/services/productService';
+import { addItemToCart } from '@/services/cartService';
+import { useAuth } from '@/contexts/AuthContext';
 
 // Sample product data (same as catalog for demo purposes)
-const allProducts = [
+export const allProducts = [
   {
     id: '1',
     name: 'Oversized Cotton Shirt',
     price: 89.99,
     images: [
-      'https://images.unsplash.com/photo-1604176424472-9e9468137614?q=80&w=1974',
-      'https://images.unsplash.com/photo-1604176424472-9e9468137614?q=80&w=1974',
-      'https://images.unsplash.com/photo-1604176424472-9e9468137614?q=80&w=1974'
+      'https://shorturl.at/MsK6o',
+      'https://shorturl.at/MsK6o',
+      'https://shorturl.at/MsK6o',
     ],
     category: 'women',
     description: 'A relaxed fit oversized cotton shirt perfect for everyday wear. Made from premium 100% organic cotton for ultimate comfort and breathability. Features a classic collar, button-down front, and long sleeves with button cuffs. The oversized silhouette provides a fashionable, laid-back look that pairs perfectly with jeans, leggings, or tucked into skirts.',
@@ -66,9 +70,9 @@ const allProducts = [
     name: 'High-Waisted Trousers',
     price: 119.99,
     images: [
-      'https://images.unsplash.com/photo-1548624313-0396965c11f3?q=80&w=2070',
-      'https://images.unsplash.com/photo-1548624313-0396965c11f3?q=80&w=2070',
-      'https://images.unsplash.com/photo-1548624313-0396965c11f3?q=80&w=2070'
+      'https://shorturl.at/bsQ84',
+      'https://shorturl.at/bsQ84',
+      'https://shorturl.at/bsQ84'
     ],
     category: 'women',
     description: 'Elegant high-waisted trousers for a sophisticated look. These tailored trousers feature a flattering high waist, side pockets, and a relaxed straight leg. Made from a premium blend with a hint of stretch for comfort and movement. Perfect for office wear or dressed up for special occasions.',
@@ -153,6 +157,8 @@ const ProductDetail = () => {
   const [showSizeGuide, setShowSizeGuide] = useState(false);
   const [isZoomed, setIsZoomed] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const { toast } = useToast();
+  const { currentUser } = useAuth();
 
   useEffect(() => {
     // Find the product by id
@@ -196,35 +202,64 @@ const ProductDetail = () => {
     }
   };
 
-  const handleAddToCart = () => {
-    // Validation
+  const handleAddToCart = async () => {
+    if (!currentUser) {
+      toast({
+        title: "Please log in to add items to your cart.",
+        variant: "destructive",
+      });
+      return;
+    }
     let errorMessage = "";
-    
     if (product.sizes && product.sizes.length > 0 && !selectedSize) {
       errorMessage = "Please select a size";
     } else if (product.colors && product.colors.length > 0 && !selectedColor) {
       errorMessage = "Please select a color";
     }
-    
     if (errorMessage) {
-      toast(errorMessage, {
+      toast({
+        title: errorMessage,
         description: "You need to make all selections before adding to cart",
+        variant: "destructive",
       });
       return;
     }
-    
-    // Add to cart logic would go here
-    toast.success("Added to cart!", {
-      description: `${product.name} x ${quantity}`,
-    });
+    const item = {
+      productId: product.id,
+      quantity: 1,
+      selectedSize: selectedSize || null,
+      selectedColor: selectedColor || null,
+      addedAt: new Date(),
+    };
+    try {
+      // Usage example: addItemToCart to add product to cart
+      await addItemToCart(currentUser.uid, item);
+      toast({
+        title: "Added to cart!",
+        description: `${product.name} x 1`,
+        variant: "success",
+      });
+    } catch (error) {
+      toast({
+        title: "Failed to add item to cart.",
+        description: "An error occurred. Please try again.",
+        variant: "destructive",
+      });
+      console.error("Error adding to cart:", error);
+    }
   };
 
   const toggleFavorite = () => {
     setIsFavorited(!isFavorited);
     if (!isFavorited) {
-      toast.success("Added to wishlist!");
+      toast({
+        title: "Added to wishlist!",
+        variant: "success",
+      });
     } else {
-      toast("Removed from wishlist");
+      toast({
+        title: "Removed from wishlist",
+      });
     }
   };
 

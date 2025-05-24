@@ -1,7 +1,6 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { getCart, addToCart, updateCartItemQuantity, removeFromCart, clearCart } from '@/services/cartService';
+import { getCart, addItemToCart, removeItemFromCart, updateCart } from '@/services/cartService';
 import { toast } from 'sonner';
 
 const CartContext = createContext();
@@ -46,7 +45,7 @@ export function CartProvider({ children }) {
 
     setLoading(true);
     try {
-      const updatedCart = await addToCart(currentUser.uid, item);
+      const updatedCart = await addItemToCart(currentUser.uid, item);
       setCart(updatedCart);
       toast.success(`${item.name} added to cart`);
     } catch (error) {
@@ -62,13 +61,15 @@ export function CartProvider({ children }) {
 
     setLoading(true);
     try {
-      const updatedCart = await updateCartItemQuantity(
-        currentUser.uid, 
-        itemId, 
-        selectedSize, 
-        selectedColor, 
-        quantity
-      );
+      // Find the item and update its quantity
+      const updatedItems = cart.items.map(item =>
+        item.productId === itemId &&
+        item.selectedSize === selectedSize &&
+        item.selectedColor === selectedColor
+          ? { ...item, quantity }
+          : item
+      ).filter(item => item.quantity > 0);
+      const updatedCart = await updateCart(currentUser.uid, updatedItems);
       setCart(updatedCart);
     } catch (error) {
       console.error('Error updating cart:', error);
@@ -83,7 +84,7 @@ export function CartProvider({ children }) {
 
     setLoading(true);
     try {
-      const updatedCart = await removeFromCart(
+      const updatedCart = await removeItemFromCart(
         currentUser.uid, 
         itemId, 
         selectedSize, 
@@ -104,8 +105,9 @@ export function CartProvider({ children }) {
 
     setLoading(true);
     try {
-      const emptyCartData = await clearCart(currentUser.uid);
-      setCart(emptyCartData);
+      // Use updateCart to clear cart
+      await updateCart(currentUser.uid, []);
+      setCart({ ...cart, items: [] });
       toast('Cart cleared');
     } catch (error) {
       console.error('Error clearing cart:', error);

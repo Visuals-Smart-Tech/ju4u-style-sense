@@ -3,78 +3,103 @@ import { Link } from 'react-router-dom';
 import { X, Plus, Minus, ShoppingBag, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/components/ui/sonner';
-
-// Sample cart data
-const initialCartItems = [
-	{
-		id: '1',
-		name: 'Oversized Cotton Shirt',
-		price: 89.99,
-		images: [
-			'https://images.unsplash.com/photo-1604176424472-9e9468137614?q=80&w=1974'
-		],
-		category: 'women',
-		description:
-			'A relaxed fit oversized cotton shirt perfect for everyday wear.',
-		sizes: ['XS', 'S', 'M', 'L', 'XL'],
-		colors: ['White', 'Black', 'Blue'],
-		brand: 'JU4U Essentials',
-		inStock: true,
-		featured: true,
-		quantity: 1,
-		selectedSize: 'M',
-		selectedColor: 'White'
-	},
-	{
-		id: '3',
-		name: 'Leather Crossbody Bag',
-		price: 149.99,
-		images: [
-			'https://images.unsplash.com/photo-1594223274512-ad4803739b7c?q=80&w=2057'
-		],
-		category: 'accessories',
-		description: 'A versatile leather crossbody bag with adjustable strap.',
-		colors: ['Black', 'Brown', 'Tan'],
-		brand: 'JU4U Accessories',
-		inStock: true,
-		featured: true,
-		bestseller: true,
-		quantity: 1,
-		selectedColor: 'Black'
-	}
-];
+import { useAuth } from '@/contexts/AuthContext';
+import { getCart, removeItemFromCart, updateCart } from '@/services/cartService';
+import { getProductById } from '@/services/productService';
 
 const Cart = () => {
-	const [cartItems, setCartItems] = useState(initialCartItems);
+	const { currentUser } = useAuth();
+	const [cartItems, setCartItems] = useState([]);
+	const [loading, setLoading] = useState(false);
 	const [promoCode, setPromoCode] = useState('');
 	const [promoApplied, setPromoApplied] = useState(false);
 	const [discount, setDiscount] = useState(0);
 
+	// Fetch cart from Firestore and product info for each item
+	useEffect(() => {
+		const fetchCartAndProducts = async () => {
+			if (!currentUser) {
+				setCartItems([]);
+				return;
+			}
+			setLoading(true);
+			try {
+				// cartService usage example
+				const cart = await getCart(currentUser.uid);
+				// productService usage example
+				const itemsWithProduct = await Promise.all(
+					(cart.items || []).map(async item => {
+						try {
+							const product = await getProductById(item.productId);
+							return { ...item, ...product };
+						} catch {
+							return item; // fallback if product not found
+						}
+					})
+				);
+				setCartItems(itemsWithProduct);
+			} catch (error) {
+				toast.error('Failed to load your cart');
+			} finally {
+				setLoading(false);
+			}
+		};
+		fetchCartAndProducts();
+	}, [currentUser]);
+
 	// Calculate totals
 	const subtotal = cartItems.reduce(
-		(sum, item) => sum + item.price * item.quantity,
+		(sum, item) => sum + (item.price || 0) * (item.quantity || 1),
 		0
 	);
 	const shipping = subtotal > 100 ? 0 : 9.99;
 	const total = subtotal + shipping - discount;
 
-	const updateQuantity = (id, newQuantity) => {
+	const updateQuantity = async (
+		productId,
+		selectedSize,
+		selectedColor,
+		newQuantity
+	) => {
+		if (!currentUser) return;
 		if (newQuantity < 1) return;
-
-		setCartItems(prevItems =>
-			prevItems.map(item =>
-				item.id === id ? { ...item, quantity: newQuantity } : item
-			)
-		);
+		setLoading(true);
+		try {
+			const updatedItems = cartItems.map(item =>
+				item.productId === productId &&
+				item.selectedSize === selectedSize &&
+				item.selectedColor === selectedColor
+					? { ...item, quantity: newQuantity }
+					: item
+			);
+			// updateCart usage example
+			await updateCart(currentUser.uid, updatedItems);
+			setCartItems(updatedItems);
+		} catch (error) {
+			toast.error('Failed to update cart');
+		} finally {
+			setLoading(false);
+		}
 	};
 
-	const removeItem = id => {
-		setCartItems(prevItems => prevItems.filter(item => item.id !== id));
-		toast('Item removed from cart');
+	const removeItem = async (productId, selectedSize, selectedColor) => {
+		if (!currentUser) return;
+		setLoading(true);
+		try {
+			// removeItemFromCart usage example
+			await removeItemFromCart(currentUser.uid, productId, selectedSize, selectedColor);
+			setCartItems(prev => prev.filter(item =>
+				!(item.productId === productId && item.selectedSize === selectedSize && item.selectedColor === selectedColor)
+			));
+			toast('Item removed from cart');
+		} catch (error) {
+			toast.error('Failed to remove item from cart');
+		} finally {
+			setLoading(false);
+		}
 	};
 
 	const handlePromoCode = () => {
-		// Simple demo promo code
 		if (promoCode.toLowerCase() === 'ju4u20') {
 			setDiscount(subtotal * 0.2);
 			setPromoApplied(true);
@@ -90,18 +115,19 @@ const Cart = () => {
 		setPromoCode('');
 	};
 
-	// Save cart to localStorage (for demo purposes)
-	useEffect(() => {
-		// In a real app, we'd save to user's profile or session
-		console.log('Cart updated:', cartItems);
-	}, [cartItems]);
+	if (loading) {
+		return (
+			<div className="container max-w-7xl mx-auto px-4 py-8 text-center">
+				<div className="text-lg">Loading your cart...</div>
+			</div>
+		);
+	}
 
 	return (
 		<div className="container max-w-7xl mx-auto px-4 py-8">
 			<h1 className="text-3xl md:text-4xl font-bold mb-8">
 				Your Shopping Cart
 			</h1>
-
 			{cartItems.length === 0 ? (
 				<div className="text-center py-16 border rounded-lg">
 					<div className="mb-6 flex justify-center">
@@ -126,24 +152,23 @@ const Cart = () => {
 							<div className="w-1/4 text-center">Quantity</div>
 							<div className="w-1/4 text-right">Total</div>
 						</div>
-
 						{cartItems.map(item => (
 							<div
-								key={item.id}
+								key={item.productId + (item.selectedSize || '') + (item.selectedColor || '')}
 								className="flex flex-col md:flex-row items-center py-6 border-b"
 							>
 								{/* Product Info */}
 								<div className="w-full md:w-1/2 flex mb-4 md:mb-0">
 									<div className="w-20 h-20 bg-gray-100 rounded overflow-hidden flex-shrink-0">
 										<img
-											src={item.images[0]}
+											src={item.images ? item.images[0] : ''}
 											alt={item.name}
 											className="w-full h-full object-cover"
 										/>
 									</div>
 									<div className="ml-4 flex-1">
 										<Link
-											to={`/product/${item.id}`}
+											to={`/product/${item.productId}`}
 											className="font-medium hover:text-ju4u-coral transition-colors"
 										>
 											{item.name}
@@ -158,10 +183,10 @@ const Cart = () => {
 											{item.selectedColor && (
 												<p>Color: {item.selectedColor}</p>
 											)}
-											<p>${item.price.toFixed(2)}</p>
+											<p>${item.price?.toFixed(2)}</p>
 										</div>
 										<button
-											onClick={() => removeItem(item.id)}
+											onClick={() => removeItem(item.productId, item.selectedSize, item.selectedColor)}
 											className="text-gray-500 hover:text-ju4u-coral text-sm flex items-center mt-2 md:hidden"
 										>
 											<X className="h-3 w-3 mr-1" />
@@ -169,14 +194,11 @@ const Cart = () => {
 										</button>
 									</div>
 								</div>
-
 								{/* Quantity */}
 								<div className="w-full md:w-1/4 flex justify-center my-4 md:my-0">
 									<div className="flex items-center">
 										<button
-											onClick={() =>
-												updateQuantity(item.id, item.quantity - 1)
-											}
+											onClick={() => updateQuantity(item.productId, item.selectedSize, item.selectedColor, item.quantity - 1)}
 											className="w-8 h-8 border border-gray-300 rounded-l-md flex items-center justify-center hover:bg-gray-100"
 											disabled={item.quantity <= 1}
 										>
@@ -186,16 +208,13 @@ const Cart = () => {
 											{item.quantity}
 										</div>
 										<button
-											onClick={() =>
-												updateQuantity(item.id, item.quantity + 1)
-											}
+											onClick={() => updateQuantity(item.productId, item.selectedSize, item.selectedColor, item.quantity + 1)}
 											className="w-8 h-8 border border-gray-300 rounded-r-md flex items-center justify-center hover:bg-gray-100"
 										>
 											<Plus className="h-3 w-3" />
 										</button>
 									</div>
 								</div>
-
 								{/* Total */}
 								<div className="w-full md:w-1/4 flex items-center justify-between md:justify-end">
 									<span className="text-gray-800 font-medium md:hidden">
@@ -205,7 +224,7 @@ const Cart = () => {
 										${(item.price * item.quantity).toFixed(2)}
 									</span>
 									<button
-										onClick={() => removeItem(item.id)}
+										onClick={() => removeItem(item.productId, item.selectedSize, item.selectedColor)}
 										className="text-gray-500 hover:text-ju4u-coral ml-4 hidden md:block"
 									>
 										<X className="h-4 w-4" />
