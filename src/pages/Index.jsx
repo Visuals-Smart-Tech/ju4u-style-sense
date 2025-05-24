@@ -1,4 +1,3 @@
-
 import React from 'react';
 import Hero from '@/components/Hero';
 import FeaturedProducts from '@/components/FeaturedProducts';
@@ -89,43 +88,87 @@ const Index = () => {
         </div>
       </section>
       
-      <FeaturedProducts />
+      {/* Featured Products Section */}
+      <section className="py-16 bg-white">
+        <div className="container max-w-5xl mx-auto px-4">
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-10">
+            <div>
+              <span className="text-ju4u-coral font-medium uppercase tracking-wider text-sm block mb-2">Featured</span>
+              <h2 className="text-3xl md:text-4xl font-bold">Trending Now</h2>
+            </div>
+          </div>
+          <FeaturedProducts />
+        </div>
+      </section>
       
       {/* Brand Promise Section with improved design */}
-      <section className="py-16 bg-white border-t border-gray-100">
-        <div className="container max-w-7xl mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center p-6 group">
-              <div className="mx-auto w-16 h-16 flex items-center justify-center bg-ju4u-gray rounded-full mb-4 group-hover:bg-ju4u-coral/10 transition-colors duration-300">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-ju4u-coral">
+      <section className="py-16 bg-gradient-to-br from-ju4u-gray via-white to-ju4u-gray relative overflow-hidden hidden md:block">
+        {/* Subtle pattern overlay */}
+        <div className="absolute inset-0 pointer-events-none opacity-20" aria-hidden="true">
+          <svg width="100%" height="100%" className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <pattern id="dots" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+                <circle cx="2" cy="2" r="2" fill="#FF6B6B" fillOpacity="0.08" />
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#dots)" />
+          </svg>
+        </div>
+        <div className="container max-w-7xl mx-auto px-4 relative z-10">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
+            {/* Card 1 */}
+            <div className="bg-white/80 rounded-xl shadow-sm p-8 text-center group transition-all duration-300 hover:-translate-y-2 hover:shadow-lg cursor-pointer">
+              <div className="mx-auto w-16 h-16 flex items-center justify-center bg-ju4u-gray rounded-full mb-4 animate-float group-hover:animate-pulse transition-all duration-300">
+                {/* Heart Icon */}
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-ju4u-coral">
                   <path d="M20.42 4.58a5.4 5.4 0 0 0-7.65 0l-.77.78-.77-.78a5.4 5.4 0 0 0-7.65 0C1.46 6.7 1.33 10.28 4 13l8 8 8-8c2.67-2.72 2.54-6.3.42-8.42z"></path>
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold mb-2">Curated Style</h3>
-              <p className="text-gray-600">Handpicked collections tailored just for your personal style and preferences.</p>
+              <h3 className="text-lg font-bold mb-2">Curated Style</h3>
+              <p className="text-gray-600 text-sm">Handpicked collections tailored for your personal style.</p>
             </div>
-            
-            <div className="text-center p-6 group">
-              <div className="mx-auto w-16 h-16 flex items-center justify-center bg-ju4u-gray rounded-full mb-4 group-hover:bg-ju4u-coral/10 transition-colors duration-300">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-ju4u-coral">
+            {/* Card 2 */}
+            <div className="bg-white/80 rounded-xl shadow-sm p-8 text-center group transition-all duration-300 hover:-translate-y-2 hover:shadow-lg cursor-pointer">
+              <div className="mx-auto w-16 h-16 flex items-center justify-center bg-ju4u-gray rounded-full mb-4 animate-float group-hover:animate-pulse transition-all duration-300">
+                {/* Shipping Icon */}
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-ju4u-coral">
                   <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"></path>
                   <path d="M12 12v9"></path>
                   <path d="m8 17 4 4 4-4"></path>
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold mb-2">Fast Shipping</h3>
-              <p className="text-gray-600">Free express shipping on orders over $100 and easy returns.</p>
+              <h3 className="text-lg font-bold mb-2">Fast Shipping</h3>
+              <p className="text-gray-600 text-sm">Free express shipping on orders over $100 and easy returns.</p>
             </div>
-            
-            <div className="text-center p-6 group">
-              <div className="mx-auto w-16 h-16 flex items-center justify-center bg-ju4u-gray rounded-full mb-4 group-hover:bg-ju4u-coral/10 transition-colors duration-300">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-ju4u-coral">
+            {/* Card 3 */}
+            <div className="bg-white/80 rounded-xl shadow-sm p-8 text-center group transition-all duration-300 hover:-translate-y-2 hover:shadow-lg cursor-pointer">
+              <div className="mx-auto w-16 h-16 flex items-center justify-center bg-ju4u-gray rounded-full mb-4 animate-float group-hover:animate-pulse transition-all duration-300">
+                {/* Shield Icon */}
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-ju4u-coral">
                   <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"></path>
                   <path d="m9 12 2 2 4-4"></path>
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold mb-2">Secure Shopping</h3>
-              <p className="text-gray-600">Encrypted transactions and buyer protection on all purchases.</p>
+              <h3 className="text-lg font-bold mb-2">Secure Shopping</h3>
+              <p className="text-gray-600 text-sm">Encrypted transactions and buyer protection on all purchases.</p>
+            </div>
+            {/* Card 4 (optional) */}
+            <div className="bg-white/80 rounded-xl shadow-sm p-8 text-center group transition-all duration-300 hover:-translate-y-2 hover:shadow-lg cursor-pointer">
+              <div className="mx-auto w-16 h-16 flex items-center justify-center bg-ju4u-gray rounded-full mb-4 animate-float group-hover:animate-pulse transition-all duration-300">
+                {/* Sparkle Icon */}
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-ju4u-coral">
+                  <path d="M12 2v4"></path>
+                  <path d="M12 18v4"></path>
+                  <path d="M4.93 4.93l2.83 2.83"></path>
+                  <path d="M16.24 16.24l2.83 2.83"></path>
+                  <path d="M2 12h4"></path>
+                  <path d="M18 12h4"></path>
+                  <path d="M4.93 19.07l2.83-2.83"></path>
+                  <path d="M16.24 7.76l2.83-2.83"></path>
+                </svg>
+              </div>
+              <h3 className="text-lg font-bold mb-2">Satisfaction Guarantee</h3>
+              <p className="text-gray-600 text-sm">30-day hassle-free returns and dedicated support.</p>
             </div>
           </div>
         </div>

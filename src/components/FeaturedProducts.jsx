@@ -1,8 +1,6 @@
-import React from 'react';
-import ProductCard from './ProductCard';
+import React, { useRef, useState, useEffect } from 'react';
+import ProductCardEnhanced from './ProductCardEnhanced';
 import { Button } from '@/components/ui/button';
-import { Link } from 'react-router-dom';
-import { ArrowRight } from 'lucide-react';
 
 // Sample featured products data
 const featuredProducts = [
@@ -74,41 +72,84 @@ const featuredProducts = [
 	},
 ];
 
-const FeaturedProducts = ({
-	title = 'Featured Products',
-	subtitle = 'Handpicked for your unique style',
-}) => {
-	return (
-		<section className="section-padding bg-white">
-			<div className="container max-w-7xl mx-auto px-4">
-				<div className="flex flex-col md:flex-row md:items-end md:justify-between mb-12">
-					<div>
-						<span className="text-ju4u-coral font-medium uppercase tracking-wider text-sm block mb-2">Collection</span>
-						<h2 className="text-3xl md:text-4xl font-rubik font-bold mb-2">{title}</h2>
-						<p className="text-gray-600">{subtitle}</p>
-					</div>
-					<Link to="/catalog" className="hidden md:flex items-center mt-4 md:mt-0 group">
-						<span className="font-medium mr-2 group-hover:text-ju4u-coral transition-colors">View All</span>
-						<ArrowRight className="h-4 w-4 transform group-hover:translate-x-1 transition-transform" />
-					</Link>
-				</div>
+const FeaturedProducts = ({ carousel = true, quickActions = true, showRatings = true, showBadges = true }) => {
+	const [current, setCurrent] = useState(0);
+	const [slideCount, setSlideCount] = useState(4);
+	const sliderRef = useRef();
 
-				<div className="product-container">
+	// Responsive slide count
+	useEffect(() => {
+		const updateSlideCount = () => {
+			if (window.innerWidth < 640) setSlideCount(1);
+			else if (window.innerWidth < 1024) setSlideCount(2);
+			else setSlideCount(Math.min(4, featuredProducts.length));
+		};
+		updateSlideCount();
+		window.addEventListener('resize', updateSlideCount);
+		return () => window.removeEventListener('resize', updateSlideCount);
+	}, []);
+
+	const maxIndex = Math.max(0, featuredProducts.length - slideCount);
+
+	const handlePrev = () => setCurrent((prev) => Math.max(0, prev - 1));
+	const handleNext = () => setCurrent((prev) => Math.min(maxIndex, prev + 1));
+
+	if (carousel && featuredProducts.length <= slideCount) {
+		return (
+			<div className="flex flex-col items-center">
+				<div className="flex flex-wrap justify-center gap-6 w-full">
 					{featuredProducts.map((product) => (
-						<ProductCard key={product.id} product={product} />
+						<div key={product.id} className="w-full max-w-xs flex-shrink-0">
+							<ProductCardEnhanced product={product} showRatings={showRatings} showBadges={showBadges} quickActions={quickActions} />
+						</div>
 					))}
 				</div>
+			</div>
+		);
+	}
 
-				<div className="text-center mt-12 md:hidden">
-					<Link to="/catalog">
-						<Button className="btn-outline inline-flex items-center gap-2">
-							View All Products
-							<ArrowRight className="h-4 w-4" />
-						</Button>
-					</Link>
+	if (carousel) {
+		return (
+			<div className="relative">
+				<div className="flex items-center justify-between mb-6">
+					<h3 className="text-xl font-bold">Featured Products</h3>
+					<div className="flex gap-2">
+						<Button variant="outline" onClick={handlePrev} disabled={current === 0}>&lt;</Button>
+						<Button variant="outline" onClick={handleNext} disabled={current === maxIndex}>&gt;</Button>
+					</div>
+				</div>
+				<div className="overflow-hidden">
+					<div
+						ref={sliderRef}
+						className="flex transition-transform duration-500 gap-6 md:gap-8 xl:gap-10"
+						style={{ transform: `translateX(-${current * 100}%)` }}
+					>
+						{featuredProducts.map((product, idx) => (
+							<div
+								key={product.id}
+								className="w-full max-w-xs flex-shrink-0"
+								style={{ minWidth: '100%' }}
+							>
+								{idx === current && (
+									<ProductCardEnhanced product={product} showRatings={showRatings} showBadges={showBadges} quickActions={quickActions} />
+								)}
+							</div>
+						))}
+					</div>
 				</div>
 			</div>
-		</section>
+		);
+	}
+
+	// Fallback grid
+	return (
+		<div className="flex flex-wrap justify-center gap-6 md:gap-8 xl:gap-10">
+			{featuredProducts.map((product) => (
+				<div key={product.id} className="w-full max-w-xs flex-shrink-0">
+					<ProductCardEnhanced product={product} showRatings={showRatings} showBadges={showBadges} quickActions={quickActions} />
+				</div>
+			))}
+		</div>
 	);
 };
 
